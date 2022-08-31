@@ -1,6 +1,7 @@
 package com.finalproject.seatudy.entity;
 
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
+import com.finalproject.seatudy.todolist.dto.response.TodoListDoneDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,4 +34,7 @@ public class TodoList {
 
     }
 
+    public void done() {
+        this.done = 1;
+    }
 }

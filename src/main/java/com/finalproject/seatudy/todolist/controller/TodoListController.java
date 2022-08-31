@@ -37,4 +37,10 @@ public class TodoListController {
         return todolistService.deleteTodoList(todoId);
     }
 
+    //todo 리스트 완료
+    @PostMapping("/api/v1/todoLists/{todoId}")
+    public ResponseDto<?> completeTodoList(@PathVariable Long todoId){
+        return todolistService.completeTodoList(todoId);
+    }
+
 }
