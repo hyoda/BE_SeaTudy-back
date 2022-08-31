@@ -12,9 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -24,8 +22,9 @@ public class TodoListService {
 
     private final TodoListRepository todolistRepository;
     public ResponseDto<?> getAlltodoList(TodoListRequestDto todoListRequestDto, HttpServletRequest request) {
-        List<TodoList> list = todolistRepository.findAll();
+        List<TodoList> list = todolistRepository.findAllBySelectDate(todoListRequestDto.getSelectDate());
         List<TodoListResponseDto> todoListResponseDto = new ArrayList<>();
+
 
         for (TodoList todoList : list) {
             todoListResponseDto.add(TodoListResponseDto.builder()
