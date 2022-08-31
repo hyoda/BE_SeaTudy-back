@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.entity;
 
+import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,5 +27,10 @@ public class TodoList {
     private String selectDate;
 
     private int done;
+
+    public void update(TodoListRequestDto todoListRequestDto){
+        this.content = todoListRequestDto.getContent();
+
+    }
 
 }
