@@ -12,10 +12,4 @@ public class TodoListRequestDto {
     private String selectDate;
     private String content;
 
-
-        public TodoListRequestDto(String selectDate) {
-        this.selectDate = selectDate;
-
-            }
-
 }

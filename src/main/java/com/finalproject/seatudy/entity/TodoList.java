@@ -37,4 +37,7 @@ public class TodoList {
     public void done() {
         this.done = 1;
     }
+    public void cancelDone() {
+        this.done = 0;
+    }
 }

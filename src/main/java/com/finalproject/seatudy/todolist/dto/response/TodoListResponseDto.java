@@ -10,4 +10,5 @@ import lombok.Setter;
 public class TodoListResponseDto {
     private Long id;
     private String content;
+    private String selectDate;
 }
