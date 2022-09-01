@@ -11,4 +11,5 @@ public class TodoListResponseDto {
     private Long id;
     private String content;
     private String selectDate;
+    private int done;
 }

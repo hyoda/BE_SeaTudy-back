@@ -89,6 +89,7 @@ public class TodoListService {
                     .id(todoList.getTodoId())
                     .content(todoList.getContent())
                     .selectDate(todoList.getSelectDate())
+                    .done(todoList.getDone())
                     .build()
             );
 
