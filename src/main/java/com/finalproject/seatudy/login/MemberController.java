@@ -41,6 +41,4 @@ public class MemberController {
   public ResponseDto<?> logout(HttpServletRequest request) {
     return memberService.logout(request);
   }
-
-
 }

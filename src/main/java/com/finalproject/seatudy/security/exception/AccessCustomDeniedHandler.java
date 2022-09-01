@@ -3,6 +3,7 @@ package com.finalproject.seatudy.security.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class AccessDeniedHandler implements org.springframework.security.web.access.AccessDeniedHandler {
+public class AccessCustomDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
 

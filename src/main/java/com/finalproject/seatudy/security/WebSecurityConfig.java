@@ -34,9 +34,7 @@ public class WebSecurityConfig {
 
     private final JWTAuthProvider jwtAuthProvider;
     private final HeaderTokenExtractor headerTokenExtractor;
-
     private final AuthenticationConfiguration authenticationConfiguration;
-
     private final AuthenticationFailHandler authenticationFailHandler;
 
 
@@ -112,8 +110,6 @@ public class WebSecurityConfig {
         //카카오톡 skipPathList
         skipPathList.add("GET,/user/kakao/callback/**");
         skipPathList.add("GET,/user/kakao/callback");
-        skipPathList.add("GET,/kakaoLogin/**");
-        skipPathList.add("GET,/kakaoLogin");
 
 
         //회원가입하기, 로그인 관련 skipPathList
@@ -145,7 +141,6 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOrigin("http://localhost:3000/kakaoLogin");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
