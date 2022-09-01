@@ -42,7 +42,7 @@ public class TodoListService {
 
     //todo 리스트 생성
     public ResponseDto<?> createTodoList(TodoListRequestDto todoListRequestDto, HttpServletRequest request)throws IOException{
-    TodoList todoList = TodoList.builder()
+        TodoList todoList = TodoList.builder()
             .selectDate(todoListRequestDto.getSelectDate())
             .content(todoListRequestDto.getContent())
             .build();
