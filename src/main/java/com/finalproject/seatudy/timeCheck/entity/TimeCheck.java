@@ -2,10 +2,7 @@ package com.finalproject.seatudy.timeCheck.entity;
 
 import com.finalproject.seatudy.Rank.Rank;
 import com.finalproject.seatudy.login.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,6 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 public class TimeCheck {
 

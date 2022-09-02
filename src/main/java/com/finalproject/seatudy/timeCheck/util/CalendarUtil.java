@@ -3,6 +3,7 @@ package com.finalproject.seatudy.timeCheck.util;
 import com.finalproject.seatudy.Rank.Rank;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -71,8 +72,8 @@ public class CalendarUtil {
     }
 
     // 전 날 오전 5시 기준 데이터 포맷
-    private static Date dateTimeFormat(String setDateTime) throws ParseException {
-        String setToday = setDateTime + "05:00:00"; //어제 날짜 + 오전5시 -> 조건을 걸기 위해 만들어줌?
+    private static Date dateTimeFormat(String setDate) throws ParseException {
+        String setToday = setDate + "05:00:00"; //어제 날짜 + 오전5시 -> 조건을 걸기 위해 만들어줌?
         return sdtf.parse(setToday);
     }
 
@@ -84,4 +85,9 @@ public class CalendarUtil {
 //    public static String dateFormat(LocalDate localDate){
 //        return sdf.format(localDate.now());
 //    }
+
+    public static void main(String[] args) throws ParseException {
+        todayCalendarTime(Calendar.getInstance());
+        setCalendarTime(Calendar.getInstance());
+    }
 }

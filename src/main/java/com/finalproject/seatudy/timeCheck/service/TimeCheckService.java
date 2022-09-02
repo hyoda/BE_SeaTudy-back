@@ -17,6 +17,8 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -72,7 +74,7 @@ public class TimeCheckService {
             timeResponse = rank.get().getStudyTime();
         }
 
-        String nowTime = LocalTime.now(ZoneId.of("Asia/Seoul")).toString();
+        String nowTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         TimeCheck timeCheck = TimeCheck.builder()
                 .member(member)
                 .date(setToday)
@@ -128,6 +130,65 @@ public class TimeCheckService {
 
             return timeCheckDto;
         }
+        return null;
+    }
+
+    @Transactional
+    public TimeCheckListDto.TimeCheckDto checkOut(UserDetailsImpl userDetails) throws ParseException {
+
+        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new RuntimeException("NON_EXISTENT_USER")
+        );
+
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
+
+        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
+        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+
+        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
+        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
+
+        // compareTo() < 0 : 인자보다 과거
+        if (today.compareTo(setDay) < 0) {
+            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
+        }
+
+        String setToday = dateFormat(today); //날짜 형식에 맞게 String형태로 포맷
+
+        List<TimeCheck> findCheckIns = timeCheckRepository.findByMemberAndDate(member, setToday);
+        TimeCheck lastCheckIn = findCheckIns.get(findCheckIns.size() - 1); //마지막번째 기록을 get
+
+        Optional<Rank> findRank = rankRepository.findByMemberAndDate(member, setToday);
+
+        String nowTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+//        String daySum = getCheckIn(userDetails).getDaySumTime(); //총 공부시간
+
+        if (lastCheckIn.getCheckOut() != null){
+            throw new RuntimeException("TRY_START");
+        }
+
+        if (findRank.isPresent()){
+            lastCheckIn.setCheckOut(nowTime);
+            lastCheckIn.setRank(findCheckIns.get(0).getRank());
+//            findRank.get().setStudyTime(daySum);
+
+            log.info("체크아웃 {}", getCheckIn(userDetails));
+//            return getCheckIn(userDetails);
+            return null;
+        }
+
+        lastCheckIn.setCheckOut(nowTime);
+        Rank rank = Rank.builder()
+//                .studyTime(daySum)
+                .date(setToday)
+                .member(member)
+                .timeChecks(findCheckIns)
+                .build();
+        lastCheckIn.setRank(rank);
+        rankRepository.save(rank);
+
+//        return getCheckIn(userDetails);
         return null;
     }
 }

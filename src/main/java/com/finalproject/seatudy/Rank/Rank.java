@@ -2,10 +2,7 @@ package com.finalproject.seatudy.Rank;
 
 import com.finalproject.seatudy.login.Member;
 import com.finalproject.seatudy.timeCheck.entity.TimeCheck;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Builder
 public class Rank {
 
@@ -31,6 +29,6 @@ public class Rank {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(mappedBy = "ranks")
+    @OneToMany(mappedBy = "rank")
     private List<TimeCheck> timeChecks;
 }

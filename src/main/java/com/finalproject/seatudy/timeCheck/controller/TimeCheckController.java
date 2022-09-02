@@ -34,4 +34,10 @@ public class TimeCheckController {
         log.info("요청 메서드 [GET] /api/checkIn");
         return timeCheckService.getCheckIn(userDetails);
     }
+
+    @PostMapping("/checkOuts")
+    public TimeCheckListDto.TimeCheckDto checkOut(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
+        log.info("요청 메서드 [POST] /api/checkOut");
+        return timeCheckService.checkOut(userDetails);
+    }
 }

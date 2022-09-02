@@ -53,7 +53,7 @@ public class WebSecurityConfig {
                         "/v2/api-docs",
                         "/webjars/**",
                         "/swagger-resources/**",
-                        "/swagger/**");
+                        "/swagger/**", "/h2-console/**");
     }
 
     @Bean
@@ -115,7 +115,6 @@ public class WebSecurityConfig {
         //회원가입하기, 로그인 관련 skipPathList
         skipPathList.add("POST,/api/member/signup");  //회원가입
         skipPathList.add("POST,/api/member/login/**");
-
 
 
 
