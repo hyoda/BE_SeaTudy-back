@@ -18,6 +18,7 @@ public class Rank {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rankId;
 
+    @Column
     private String studyTime;
 
     @ManyToOne

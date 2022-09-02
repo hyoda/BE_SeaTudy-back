@@ -1,5 +1,6 @@
-package com.finalproject.seatudy.entity;
+package com.finalproject.seatudy.timeCheck.entity;
 
+import com.finalproject.seatudy.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,11 +20,17 @@ public class TimeCheck {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long checkId;
 
-    private LocalDateTime checkinTime;
+    @Column
+    private String date;
 
-    private LocalDateTime checkoutTime;
+    @Column
+    private String checkIn;
+
+    @Column
+    private String checkOut;
 
     @ManyToOne
+    @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
 }
