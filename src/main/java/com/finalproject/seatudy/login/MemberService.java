@@ -3,7 +3,6 @@ package com.finalproject.seatudy.login;
 
 import com.finalproject.seatudy.dto.request.LoginRequestDto;
 import com.finalproject.seatudy.dto.request.MemberRequestDto;
-import com.finalproject.seatudy.dto.request.TokenDto;
 import com.finalproject.seatudy.dto.response.KakaoUserDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
@@ -59,8 +58,8 @@ public class MemberService {
             return ResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다.");
         }
 
-        TokenDto tokenDto = jwtTokenUtils.generateTokenDto(member);
-        tokenToHeaders(tokenDto, response);
+        String accessToken = jwtTokenUtils.generateJwtToken(member);
+        tokenToHeaders(accessToken, response);
 
         return ResponseDto.success(
                 KakaoUserDto.builder()
@@ -78,13 +77,22 @@ public class MemberService {
         return optionalMember.orElse(null);
     }
 
-    public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
-        response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-        response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+    public void tokenToHeaders(String token, HttpServletResponse response) {
+        response.addHeader("Authorization", "Bearer " + token);
     }
 
     public ResponseDto<?> logout(HttpServletRequest request) {
         request.removeAttribute("Authorization");
         return ResponseDto.success("로그아웃되었습니다.");
+    }
+
+    public void checkId(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+
+
+        System.out.println("ACCESS TOKEN>>>>>" + authorization);
+
+
+
     }
 }

@@ -1,13 +1,13 @@
 package com.finalproject.seatudy.security.jwt;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.JWTVerifier;
-import com.finalproject.seatudy.security.exception.CustomException;
-import com.finalproject.seatudy.security.exception.ErrorCode;
+import io.jsonwebtoken.io.Decoders;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -21,39 +21,42 @@ public class JwtDecoder {
     @Value("${jwt.secret}")
     private String JWT_SECRET;
 
-    public String decodeUsername(String token) throws CustomException {
+    public String decodeUsername(String token){
+        DecodedJWT decodedJWT = isValidToken(token).orElseThrow(()->new AuthenticationServiceException("토큰이 유효하지 않습니다"));
+        Date expiredDate = decodedJWT.getExpiresAt();
 
-
-        DecodedJWT decodedJWT = isValidToken(token)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_AUTH_TOKEN));
-
-        Date expiredDate = decodedJWT
-                .getExpiresAt();
 
         Date now = new Date();
-        if (expiredDate.before(now)) {
-            log.debug("access-token 기간이 만료되었습니다: {}", expiredDate);
-            throw new CustomException(ErrorCode.INVALID_AUTH_TOKEN);
+        if(expiredDate.before(now)){
+            throw new AuthenticationServiceException("유효시간이 지난 토큰입니다 ");
         }
-
-        return decodedJWT
-                .getSubject();
+        return decodedJWT.getSubject();
     }
 
-    private Optional<DecodedJWT> isValidToken(String token) {
-        DecodedJWT jwt = null;
+    private Optional<DecodedJWT> isValidToken(String token){
 
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET);
+        DecodedJWT jwt = null;
+        try{
+            Algorithm algorithm = Algorithm.HMAC256(Decoders.BASE64.decode(JWT_SECRET));
             JWTVerifier verifier = JWT
-                    .require(algorithm)
-                    .build();
+                                    .require(algorithm)
+                                    .build();
 
             jwt = verifier.verify(token);
-        } catch (Exception e) {
+        }catch (Exception e){
             log.error(e.getMessage());
         }
 
         return Optional.ofNullable(jwt);
     }
+//    public boolean isValidRefreshToken(String refreshToken){
+//        DecodedJWT decodedJWT = isValidToken(refreshToken).orElseThrow(()->new IllegalArgumentException("유효한 토큰이 아닙니다."));
+//        Date expiredDate = decodedJWT.getClaim(CLAIM_EXPIRED_DATE).asDate();
+//
+//        Date now = new Date();
+//        if(expiredDate.before(now)){
+//            throw new IllegalArgumentException("유효시간이 지난 토큰 입니다");
+//        }
+//        return true;
+//    }
 }

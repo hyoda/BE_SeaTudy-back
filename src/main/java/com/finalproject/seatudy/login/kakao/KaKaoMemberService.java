@@ -3,7 +3,6 @@ package com.finalproject.seatudy.login.kakao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finalproject.seatudy.dto.request.TokenDto;
 import com.finalproject.seatudy.dto.response.KakaoUserDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.login.LoginType;
@@ -35,6 +34,7 @@ public class KaKaoMemberService {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
+
     private final JwtTokenUtils jwtTokenUtils;
 
     @Value("${security.oauth2.kakao.client_id}")
@@ -52,8 +52,8 @@ public class KaKaoMemberService {
 
         Member kakaoMember = registerKakaoUserIfNeed(kakaoUserInfo);
 
-        TokenDto tokenDto = jwtTokenUtils.generateTokenDto(kakaoMember);
-        memberService.tokenToHeaders(tokenDto, response);
+        String kakaoAC = jwtTokenUtils.generateJwtToken(kakaoMember);
+        memberService.tokenToHeaders(kakaoAC, response);
 
         log.info("카카오 로그인 완료: {}",kakaoMember.getEmail());
         return ResponseDto.success(
