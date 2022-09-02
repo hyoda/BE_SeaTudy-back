@@ -126,7 +126,7 @@ public class WebSecurityConfig {
 
 
         FilterSkipMatcher matcher = new FilterSkipMatcher(skipPathList, "/**");
-        JwtAuthFilter filter = new JwtAuthFilter(matcher, headerTokenExtractor);
+        JwtAuthFilter filter = new JwtAuthFilter(matcher,headerTokenExtractor);
 
         filter.setAuthenticationFailureHandler(authenticationFailHandler);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
