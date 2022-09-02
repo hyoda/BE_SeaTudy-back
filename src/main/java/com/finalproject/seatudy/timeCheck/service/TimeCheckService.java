@@ -1,5 +1,10 @@
 package com.finalproject.seatudy.timeCheck.service;
 
+import com.finalproject.seatudy.Rank.Rank;
+import com.finalproject.seatudy.Rank.RankRepository;
+import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.login.MemberRepository;
+import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.timeCheck.Dto.TimeCheckListDto;
 import com.finalproject.seatudy.timeCheck.entity.TimeCheck;
 import com.finalproject.seatudy.timeCheck.repository.TimeCheckRepository;
@@ -15,6 +20,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import static com.finalproject.seatudy.timeCheck.util.CalendarUtil.*;
 
@@ -24,9 +30,16 @@ import static com.finalproject.seatudy.timeCheck.util.CalendarUtil.*;
 public class TimeCheckService {
 
     private final TimeCheckRepository timeCheckRepository;
+    private final MemberRepository memberRepository;
+    private final RankRepository rankRepository;
+
 
     @Transactional
-    public String checkIn() throws ParseException {
+    public String checkIn(UserDetailsImpl userDetails) throws ParseException {
+
+        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new RuntimeException("NON_EXISTENT_USER")
+        );
 
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
 
@@ -41,9 +54,11 @@ public class TimeCheckService {
             today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
         }
 
-        String setToday = dateFormat(today);
+        String setToday = dateFormat(today); //날짜 형식에 맞게 String형태로 포맷
 
-        List<TimeCheck> timeChecks = timeCheckRepository.findByDate(setToday);
+        List<TimeCheck> timeChecks = timeCheckRepository.findByMemberAndDate(member,setToday);
+        Optional<Rank> rank = rankRepository.findByMemberAndDate(member, setToday);
+
         //체크아웃을 하지 않은 상태에서 체크인을 시도할 경우 NPE
         for (TimeCheck timeCheck : timeChecks) {
             if (timeCheck.getCheckOut() == null) {
@@ -53,8 +68,13 @@ public class TimeCheckService {
 
         String timeResponse = "00:00:00";
 
+        if (rank.isPresent()){
+            timeResponse = rank.get().getStudyTime();
+        }
+
         String nowTime = LocalTime.now(ZoneId.of("Asia/Seoul")).toString();
         TimeCheck timeCheck = TimeCheck.builder()
+                .member(member)
                 .date(setToday)
                 .checkIn(nowTime)
                 .build();
@@ -65,7 +85,11 @@ public class TimeCheckService {
         return timeResponse;
     }
 
-    public TimeCheckListDto.TimeCheckDto getCheckIn() throws ParseException {
+    public TimeCheckListDto.TimeCheckDto getCheckIn(UserDetailsImpl userDetails) throws ParseException {
+
+        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new RuntimeException("NON_EXISTENT_USER")
+        );
 
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
 
@@ -82,13 +106,28 @@ public class TimeCheckService {
 
         String setToday = dateFormat(today);
 
-        List<TimeCheck> findCheckIn = timeCheckRepository.findByDate(setToday);
+        Optional<Rank> rank = rankRepository.findByMemberAndDate(member, setToday);
+
+        List<TimeCheck> findCheckIn = timeCheckRepository.findByMemberAndDate(member, setToday);
 
         List<TimeCheckListDto.TodayLogDto> todayLogDtos = new ArrayList<>(); // 그 날의 로그 기록
 
+        // 기록이 없을 경우
         if (findCheckIn.size() == 0){
+            List<Rank> allMemberList = rankRepository.findByMember(member);
 
+            String total = totalTime(allMemberList);
+
+            TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
+                    .daySumTime("00:00:00")
+                    .totalSumTime(total)
+                    .todayLogs(todayLogDtos)
+                    .build();
+
+            log.info("체크인 기록이 없음 {}", timeCheckDto);
+
+            return timeCheckDto;
         }
-
+        return null;
     }
 }

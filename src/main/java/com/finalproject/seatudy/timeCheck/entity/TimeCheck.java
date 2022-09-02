@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.timeCheck.entity;
 
+import com.finalproject.seatudy.Rank.Rank;
 import com.finalproject.seatudy.login.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
@@ -32,5 +32,9 @@ public class TimeCheck {
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @ManyToOne
+    @JoinColumn(name = "RANKS_ID")
+    private Rank rank;
 
 }

@@ -1,11 +1,14 @@
 package com.finalproject.seatudy.timeCheck.util;
 
+import com.finalproject.seatudy.Rank.Rank;
+
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static com.finalproject.seatudy.timeCheck.util.Formatter.sdf;
 import static com.finalproject.seatudy.timeCheck.util.Formatter.sdtf;
@@ -37,6 +40,24 @@ public class CalendarUtil {
         String strToday = dateFormat(setTime); //오늘 날짜 str yyyy-MM-dd 형식
         Date setFormatter = dateTimeFormat(strToday); //yyyy-MM-dd 05:00:00(당일 오전 5시)
         setTime.setTime(setFormatter); //yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+    }
+
+    public static String totalTime(List<Rank> allUserList) {
+
+        int total = 0; //총 누적 공부시간이 담김
+
+        for (Rank find : allUserList) {
+            String[] arrayFind = find.getStudyTime().split(":");
+            int allHH = Integer.parseInt(arrayFind[0]);
+            int allMM = allHH * 60;
+            int alltotal = allMM + Integer.parseInt(arrayFind[1]); //분으로 환산
+            total += alltotal;
+        }
+
+        String totalHH = String.valueOf(total / 60);
+        String totalMM = String.valueOf(total % 60);
+        String totalSumTime = totalHH + ":" + totalMM;
+        return totalSumTime;
     }
 
     // String yyyy-MM-dd HH:mm:ss 형식으로 return; 현재 시간
