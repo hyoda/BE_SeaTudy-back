@@ -1,6 +1,6 @@
 package com.finalproject.seatudy.timeCheck.entity;
 
-import com.finalproject.seatudy.entity.Member;
+import com.finalproject.seatudy.login.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

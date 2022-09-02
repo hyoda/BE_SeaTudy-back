@@ -36,4 +36,5 @@ application.properties
 /.nb-gradle/
 
 ### VS Code ###
+
 .vscode/

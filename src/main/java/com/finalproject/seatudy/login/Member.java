@@ -1,10 +1,12 @@
-package com.finalproject.seatudy.entity;
+package com.finalproject.seatudy.login;
 
+import com.finalproject.seatudy.entity.TimeStamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 
@@ -13,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Builder
-public class Member extends TimeStamped{
+public class Member extends TimeStamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +30,14 @@ public class Member extends TimeStamped{
     @Column
     private String password;
 
-    @Transient
-    private String passwordConfirm;
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
 
     @Nullable
     private String birthday;
+
+    public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
+        return passwordEncoder.matches(password, this.password);
+    }
 
 }
