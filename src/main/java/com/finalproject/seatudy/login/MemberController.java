@@ -7,10 +7,7 @@ import com.finalproject.seatudy.dto.request.MemberRequestDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.login.kakao.KaKaoMemberService;
 import com.finalproject.seatudy.login.naver.NaverMemberService;
-import com.finalproject.seatudy.security.UserDetailsImpl;
-import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

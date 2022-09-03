@@ -36,6 +36,9 @@ public class Member extends TimeStamped {
     @Nullable
     private String birthday;
 
+
+
+
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
     }
