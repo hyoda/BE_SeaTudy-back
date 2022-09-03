@@ -19,8 +19,9 @@ public class Rank {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rankId;
 
+    // 일일 총 공부한 시간
     @Column
-    private String studyTime;
+    private String dayStudy;
 
     @Column
     private String date;

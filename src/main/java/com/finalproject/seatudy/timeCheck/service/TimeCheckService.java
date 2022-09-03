@@ -15,16 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.finalproject.seatudy.timeCheck.util.CalendarUtil.*;
+import static com.finalproject.seatudy.timeCheck.util.Formatter.sdtf;
+import static com.finalproject.seatudy.timeCheck.util.Formatter.stf;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class TimeCheckService {
 
 
     @Transactional
-    public String checkIn(UserDetailsImpl userDetails) throws ParseException {
+    public TimeCheckListDto.CheckIn checkIn(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new RuntimeException("NON_EXISTENT_USER")
@@ -68,10 +66,10 @@ public class TimeCheckService {
             }
         }
 
-        String timeResponse = "00:00:00";
+        String timeWatch = "00:00:00";
 
         if (rank.isPresent()){
-            timeResponse = rank.get().getStudyTime();
+            timeWatch = rank.get().getDayStudy();
         }
 
         String nowTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -82,9 +80,15 @@ public class TimeCheckService {
                 .build();
         timeCheckRepository.save(timeCheck);
 
-        log.info("체크인 {}", timeResponse);
+        log.info("체크인 {}", timeWatch);
 
-        return timeResponse;
+        TimeCheckListDto.CheckIn checkIn = TimeCheckListDto.CheckIn.builder()
+                .checkIn(nowTime)
+                .timeWatch(timeWatch)
+                .build();
+
+        return checkIn;
+//        return timeWatch;
     }
 
     public TimeCheckListDto.TimeCheckDto getCheckIn(UserDetailsImpl userDetails) throws ParseException {
@@ -121,8 +125,8 @@ public class TimeCheckService {
             String total = totalTime(allMemberList);
 
             TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
-                    .daySumTime("00:00:00")
-                    .totalSumTime(total)
+                    .dayStudyTime("00:00:00")
+                    .totalStudyTime(total)
                     .todayLogs(todayLogDtos)
                     .build();
 
@@ -130,11 +134,63 @@ public class TimeCheckService {
 
             return timeCheckDto;
         }
-        return null;
+
+        TimeCheck firstCheckIn = findCheckIn.get(findCheckIn.size()-1); // 체크인을 한번이라도 했을 경우
+
+        Calendar checkInCalendar = Calendar.getInstance();
+        String setCheckIn = firstCheckIn.getDate() + " " + firstCheckIn.getCheckIn(); //yyyy-MM-dd HH:mm:ss
+        checkInCalendar.setTime(sdtf.parse(setCheckIn)); // checkIn 시간 기준으로 켈린더 셋팅
+
+        String[] timeStamp = firstCheckIn.getCheckIn().split(":"); //시, 분, 초 나누기
+
+        int HH = Integer.parseInt(timeStamp[0]); //시
+        int mm = Integer.parseInt(timeStamp[1]); //분
+        int ss = Integer.parseInt(timeStamp[2]); //초
+
+        today.add(Calendar.HOUR, -HH);
+        today.add(Calendar.MINUTE, -mm);
+        today.add(Calendar.SECOND, -ss);
+
+        String dayStudyTime = RankCheck(rank, today); //하루 누적 시간 계산
+
+        List<Rank> allMemberList = rankRepository.findByMember(member);
+
+        String total = totalTime(allMemberList);
+
+        for (TimeCheck check : findCheckIn){
+            TimeCheckListDto.TodayLogDto todayLogDto = TimeCheckListDto.TodayLogDto.builder()
+                    .checkIn(check.getCheckIn())
+                    .checkOut(check.getCheckOut())
+                    .build();
+            todayLogDtos.add(todayLogDto);
+        }
+
+        //체크인, 체크아웃 기록된 세트가 1회 이상 있는 경우
+        if (findCheckIn.get(findCheckIn.size() - 1).getCheckOut() != null){
+            String todayStudy = rank.get().getDayStudy();
+            TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
+                    .dayStudyTime(todayStudy)
+                    .totalStudyTime(total)
+                    .todayLogs(todayLogDtos)
+                    .build();
+
+            log.info("체크인 기록이 1회 이상 있음 {}", timeCheckDto);
+            return timeCheckDto;
+        }
+
+        // 현재시간 + 누적시간
+        TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
+                .dayStudyTime(dayStudyTime)
+                .totalStudyTime(total)
+                .todayLogs(todayLogDtos)
+                .build();
+
+        log.info("체크인 기록이 1회 이상 있음 {}", timeCheckDto);
+        return timeCheckDto;
     }
 
     @Transactional
-    public TimeCheckListDto.TimeCheckDto checkOut(UserDetailsImpl userDetails) throws ParseException {
+    public TimeCheckListDto.CheckOut checkOut(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new RuntimeException("NON_EXISTENT_USER")
@@ -162,7 +218,7 @@ public class TimeCheckService {
 
         String nowTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-//        String daySum = getCheckIn(userDetails).getDaySumTime(); //총 공부시간
+        String dayStudy = getCheckIn(userDetails).getDayStudyTime(); //총 공부시간
 
         if (lastCheckIn.getCheckOut() != null){
             throw new RuntimeException("TRY_START");
@@ -171,16 +227,22 @@ public class TimeCheckService {
         if (findRank.isPresent()){
             lastCheckIn.setCheckOut(nowTime);
             lastCheckIn.setRank(findCheckIns.get(0).getRank());
-//            findRank.get().setStudyTime(daySum);
+            findRank.get().setDayStudy(dayStudy);
 
             log.info("체크아웃 {}", getCheckIn(userDetails));
+
+            TimeCheckListDto.CheckOut checkOut = TimeCheckListDto.CheckOut.builder()
+                    .checkOut(nowTime)
+                    .timeWatch(dayStudy)
+                    .build();
+
+            return checkOut;
 //            return getCheckIn(userDetails);
-            return null;
         }
 
         lastCheckIn.setCheckOut(nowTime);
         Rank rank = Rank.builder()
-//                .studyTime(daySum)
+                .dayStudy(dayStudy)
                 .date(setToday)
                 .member(member)
                 .timeChecks(findCheckIns)
@@ -188,7 +250,37 @@ public class TimeCheckService {
         lastCheckIn.setRank(rank);
         rankRepository.save(rank);
 
+        TimeCheckListDto.CheckOut checkOut = TimeCheckListDto.CheckOut.builder()
+                .checkOut(nowTime)
+                .timeWatch(dayStudy)
+                .build();
+
+        return checkOut;
 //        return getCheckIn(userDetails);
-        return null;
+    }
+
+    private String RankCheck(Optional<Rank> rank, Calendar today) throws ParseException{
+        if (rank.isPresent()){
+            String dayStudy = stf.format(today.getTime());
+            rank.get().getDayStudy();
+            Calendar rankDay = todayCalendar(rank.get().getDate());
+            String setTime = rank.get().getDate() + " " + rank.get().getDayStudy();
+            Date setFormatter = sdtf.parse(setTime);
+            rankDay.setTime(setFormatter);
+
+            String[] reTimeStamp = dayStudy.split(":");
+
+            int reHH = Integer.parseInt(reTimeStamp[0]); //시
+            int remm = Integer.parseInt(reTimeStamp[1]); //분
+            int ress = Integer.parseInt(reTimeStamp[2]); //초
+
+            rankDay.add(Calendar.HOUR, reHH);
+            rankDay.add(Calendar.MINUTE, remm);
+            rankDay.add(Calendar.SECOND, ress);
+
+            dayStudy = stf.format(rankDay.getTime());
+            return dayStudy;
+        }
+        return stf.format(today.getTime());
     }
 }

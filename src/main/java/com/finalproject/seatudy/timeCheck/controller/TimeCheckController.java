@@ -23,7 +23,7 @@ public class TimeCheckController {
 
     // 체크인 start
     @PostMapping("/checkIns")
-    public String checkIn(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
+    public TimeCheckListDto.CheckIn checkIn(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
         log.info("요청 메서드 [POST] /api/v1/checkIns");
         return timeCheckService.checkIn(userDetails);
     }
@@ -36,7 +36,7 @@ public class TimeCheckController {
     }
 
     @PostMapping("/checkOuts")
-    public TimeCheckListDto.TimeCheckDto checkOut(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
+    public TimeCheckListDto.CheckOut checkOut(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
         log.info("요청 메서드 [POST] /api/checkOut");
         return timeCheckService.checkOut(userDetails);
     }

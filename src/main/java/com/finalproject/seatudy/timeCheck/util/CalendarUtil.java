@@ -3,7 +3,6 @@ package com.finalproject.seatudy.timeCheck.util;
 import com.finalproject.seatudy.Rank.Rank;
 
 import java.text.ParseException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,16 +47,18 @@ public class CalendarUtil {
         int total = 0; //총 누적 공부시간이 담김
 
         for (Rank find : allUserList) {
-            String[] arrayFind = find.getStudyTime().split(":");
+            String[] arrayFind = find.getDayStudy().split(":");
             int allHH = Integer.parseInt(arrayFind[0]);
-            int allMM = allHH * 60;
-            int alltotal = allMM + Integer.parseInt(arrayFind[1]); //분으로 환산
+            int allMM = Integer.parseInt(arrayFind[1]);
+            int allSS = allHH * 3600 + allMM * 60;
+            int alltotal = allSS + Integer.parseInt(arrayFind[2]); //분으로 환산
             total += alltotal;
         }
 
-        String totalHH = String.valueOf(total / 60);
-        String totalMM = String.valueOf(total % 60);
-        String totalSumTime = totalHH + ":" + totalMM;
+        String totalHH = String.valueOf(total / 3600);
+        String totalMM = String.valueOf((total % 3600) / 60);
+        String totalSS = String.valueOf((total % 3600) % 60);
+        String totalSumTime = totalHH + ":" + totalMM + ":" + totalSS;
         return totalSumTime;
     }
 
@@ -86,8 +87,8 @@ public class CalendarUtil {
 //        return sdf.format(localDate.now());
 //    }
 
-    public static void main(String[] args) throws ParseException {
-        todayCalendarTime(Calendar.getInstance());
-        setCalendarTime(Calendar.getInstance());
-    }
+//    public static void main(String[] args) throws ParseException {
+//        todayCalendarTime(Calendar.getInstance());
+//        setCalendarTime(Calendar.getInstance());
+//    }
 }
