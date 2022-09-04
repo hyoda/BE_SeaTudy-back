@@ -14,18 +14,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.UUID;
+
 
 @Slf4j
 @Service
@@ -35,7 +32,6 @@ public class KaKaoMemberService {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
-
     private final JwtTokenUtils jwtTokenUtils;
 
     @Value("${security.oauth2.kakao.client_id}")
@@ -76,8 +72,7 @@ public class KaKaoMemberService {
         body.add("redirect_uri", KAKAO_REDIRECT_URI);
         body.add("code",code);
 
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
-                new HttpEntity<>(body,headers);
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body,headers);
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
                 "https://kauth.kakao.com/oauth/token",
@@ -111,10 +106,10 @@ public class KaKaoMemberService {
         long userId = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
+        String birthday = jsonNode.get("birthday").asText();
 
-        return new KakaoUserDto(userId, email, nickname);
+        return new KakaoUserDto(userId, email, nickname,birthday);
     }
-
 
     private Member registerKakaoUserIfNeed(KakaoUserDto kakaoUserDto) {
         String email = kakaoUserDto.getEmail();

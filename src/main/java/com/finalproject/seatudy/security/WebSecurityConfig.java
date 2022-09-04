@@ -110,6 +110,7 @@ public class WebSecurityConfig {
         //카카오톡 skipPathList
         skipPathList.add("GET,/api/v1/members/kakaoLogin/**");
         skipPathList.add("GET,/api/v1/members/naverLogin/**");
+        skipPathList.add("GET,/api/v1/members/googleLogin/**");
 
 
         //회원가입하기, 로그인 관련 skipPathList
