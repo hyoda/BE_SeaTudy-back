@@ -1,16 +1,10 @@
 package com.finalproject.seatudy.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.finalproject.seatudy.login.Member;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
-import com.finalproject.seatudy.todolist.dto.response.TodoListDoneDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import lombok.*;
+import javax.persistence.*;
 
 @Entity
 @AllArgsConstructor
@@ -28,6 +22,14 @@ public class TodoList {
     private String selectDate;
 
     private int done;
+
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "todo_category_id")
+    private TodoCategory todoCategory;
 
     public void update(TodoListRequestDto todoListRequestDto){
         this.content = todoListRequestDto.getContent();

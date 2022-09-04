@@ -1,12 +1,12 @@
 package com.finalproject.seatudy.todolist.controller;
 
 import com.finalproject.seatudy.dto.response.ResponseDto;
+import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
 import com.finalproject.seatudy.todolist.service.TodoListService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 @RestController
 public class TodoListController {
@@ -25,14 +25,14 @@ public class TodoListController {
 
 
     //해당날짜에 todolist 만들기
-    @PostMapping("/api/v1/todoLists")
-    public ResponseDto<?> createTodoList(@RequestBody TodoListRequestDto todoListRequestDto, HttpServletRequest request )throws IOException {
-        return todolistService.createTodoList(todoListRequestDto, request);
+    @PostMapping("/api/v1/{todoCategoryId}/todoLists")
+    public ResponseDto<?> createTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long todoCategoryId, @RequestBody TodoListRequestDto todoListRequestDto){
+        return todolistService.createTodoList(userDetails,todoCategoryId,todoListRequestDto);
     }
 
     //todolist 내용 수정
     @PutMapping("/api/v1/todoLists/{todoId}")
-    public ResponseDto<?> updateTodoList(@PathVariable Long todoId,@RequestBody TodoListRequestDto todoListRequestDto)throws IOException{
+    public ResponseDto<?> updateTodoList(@PathVariable Long todoId,@RequestBody TodoListRequestDto todoListRequestDto){
         return todolistService.updateTodoList(todoId,todoListRequestDto);
     }
     //todolist 삭제
@@ -42,7 +42,7 @@ public class TodoListController {
     }
 
     //todolist 완료
-    @PostMapping("/api/v1/todoLists/{todoId}")
+    @PostMapping("/api/v1/{todoCategoryId}/todoLists/{todoId}")
     public ResponseDto<?> completeTodoList(@PathVariable Long todoId){
         return todolistService.completeTodoList(todoId);
     }

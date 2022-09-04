@@ -1,6 +1,7 @@
 package com.finalproject.seatudy.entity;
 
 import com.finalproject.seatudy.dday.dto.request.DdayRequestDto;
+import com.finalproject.seatudy.login.Member;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

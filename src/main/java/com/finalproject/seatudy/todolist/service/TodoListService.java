@@ -1,16 +1,18 @@
 package com.finalproject.seatudy.todolist.service;
 
 import com.finalproject.seatudy.dto.response.ResponseDto;
+import com.finalproject.seatudy.entity.TodoCategory;
 import com.finalproject.seatudy.entity.TodoList;
+import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.security.UserDetailsImpl;
+import com.finalproject.seatudy.todoCategory.repository.TodoCategoryRepository;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
 import com.finalproject.seatudy.todolist.dto.response.TodoListResponseDto;
 import com.finalproject.seatudy.todolist.repository.TodoListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import java.util.List;
 public class TodoListService {
 
     private final TodoListRepository todolistRepository;
+    private final TodoCategoryRepository todoCategoryRepository;
 
     //해당날짜 todo 리스트 전체조회
 //    public ResponseDto<?> getAlltodoList(TodoListRequestDto todoListRequestDto, HttpServletRequest request) {
@@ -41,13 +44,24 @@ public class TodoListService {
 //    }
 
     //todo 리스트 생성
-    public ResponseDto<?> createTodoList(TodoListRequestDto todoListRequestDto, HttpServletRequest request)throws IOException{
+    public ResponseDto<?> createTodoList(UserDetailsImpl userDetails,Long todoCategoryId,TodoListRequestDto todoListRequestDto){
+        Member member = userDetails.getMember();
+        TodoCategory todoCategory = getTodoCategory(todoCategoryId);
+
         TodoList todoList = TodoList.builder()
             .selectDate(todoListRequestDto.getSelectDate())
             .content(todoListRequestDto.getContent())
+            .todoCategory(todoCategory)
+            .member(member)
             .build();
     todolistRepository.save(todoList);
-    return ResponseDto.success(todoList);
+    TodoListResponseDto todoListResponseDto = TodoListResponseDto.builder()
+            .id(todoList.getTodoId())
+            .content(todoList.getContent())
+            .selectDate(todoList.getSelectDate())
+            .build();
+
+    return ResponseDto.success(todoListResponseDto);
 
     }
 
@@ -95,5 +109,11 @@ public class TodoListService {
 
         }
         return ResponseDto.success(todoListResponseDto);
+    }
+
+    private TodoCategory getTodoCategory(Long todoCategoryId){
+        return todoCategoryRepository.findById(todoCategoryId).orElseThrow(
+                () -> new IllegalArgumentException("카테고리가 존재하지 않습니다.")
+        );
     }
 }
