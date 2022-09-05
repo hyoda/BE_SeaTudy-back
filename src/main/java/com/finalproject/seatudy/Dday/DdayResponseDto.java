@@ -10,13 +10,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class DdayResponseDto {
+    private Long DdayId;
+    private String title;
     private String TargetDay;
     private Long Dday;
 
     public static DdayResponseDto fromEntity(Dday dday){
 
         return new DdayResponseDto(
-                dday.getTagetDay(),
+                dday.getDdayId(),
+                dday.getTitle(),
+                dday.getTargetDay(),
                 dday.getDday()
         );
     }

@@ -5,7 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Setter
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,8 +30,10 @@ public class Dday {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    public Dday(String tagetDay, Member member) {
-        this.targetDay = tagetDay;
-        this.member = member;
+
+    public void update(String title, String targetDay, Long dday){
+        this.title = title;
+        this.targetDay = targetDay;
+        this.dday = dday;
     }
 }

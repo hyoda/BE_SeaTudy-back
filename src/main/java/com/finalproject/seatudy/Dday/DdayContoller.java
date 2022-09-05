@@ -25,4 +25,17 @@ public class DdayContoller {
     public List<DdayResponseDto> getDday(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return ddayService.getDday(userDetails);
     }
+
+    @PutMapping("/ddays/{ddayId}")
+    public DdayResponseDto updateDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                      @PathVariable Long ddayId,
+                                      @RequestBody DdayRequestDto requestDto) throws ParseException{
+        return ddayService.updateDday(userDetails, ddayId, requestDto);
+    }
+
+    @DeleteMapping("/ddays/{ddayId}")
+    public String deleteDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                            @PathVariable Long ddayId){
+        return ddayService.deleteDday(userDetails, ddayId);
+    }
 }

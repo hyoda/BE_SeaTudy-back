@@ -21,32 +21,19 @@ import static com.finalproject.seatudy.timeCheck.util.Formatter.sdf;
 public class DdayService {
 
     private final DdayRepository ddayRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     public DdayResponseDto createDday(UserDetailsImpl userDetails
                          , DdayRequestDto requestDto) throws ParseException {
 
-        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new RuntimeException("NON_EXISTENT_USER")
-        );
+        Member member = userDetails.getMember();
 
-        String targetDay = requestDto.getTargetDay();
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
-//        String today = sdf.format(LocalDate.now(ZoneId.of("Asia/Seoul"))); -> localdate를 date형식으로 바꿔져야함
-
-//        Date ddate = sdf.parse(requestDto.getTargetDay());
-        Date ddate = sdf.parse(targetDay);
-        Date todate = sdf.parse(today);
-        long Sec = (ddate.getTime() - todate.getTime()) / 1000; // 초
-//        long Min = (ddate.getTime() - todate.getTime()) / 60000; // 분
-//        long Hour = (ddate.getTime() - todate.getTime()) / 3600000; // 시
-        Long Days = (Sec / (24*60*60)); // 일자수
+        Long ddayResult = ddayCalculate(requestDto);
 
         Dday dday = Dday.builder()
                 .title(requestDto.getTitle())
                 .targetDay(requestDto.getTargetDay())
-                .dday(Days)
+                .dday(ddayResult)
                 .member(member)
                 .build();
         ddayRepository.save(dday);
@@ -57,13 +44,70 @@ public class DdayService {
 
     public List<DdayResponseDto> getDday(UserDetailsImpl userDetails) {
 
-        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new RuntimeException("NON_EXISTENT_USER")
-        );
+        Member member = userDetails.getMember();
 
         List<Dday> ddayList = ddayRepository.findAllByMember(member);
 
         return ddayList.stream().map(DdayResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public DdayResponseDto updateDday(UserDetailsImpl userDetails,
+                                      Long ddayId,
+                                      DdayRequestDto requestDto) throws ParseException {
+
+        Member member = userDetails.getMember();
+
+        Dday dday = ddayRepository.findById(ddayId).orElseThrow(
+                () -> new RuntimeException("해당 D-day가 존재하지 않습니다.")
+        );
+
+        if (!member.getEmail().equals(dday.getMember().getEmail())){
+            throw new RuntimeException("작성자만 수정할 수 있습니다.");
+        }
+
+        Long ddayResult = ddayCalculate(requestDto);
+
+        dday.update(
+                requestDto.getTitle(),
+                requestDto.getTargetDay(),
+                ddayResult
+        );
+
+        DdayResponseDto responseDto = DdayResponseDto.fromEntity(dday);
+        return responseDto;
+    }
+
+    @Transactional
+    public String deleteDday(UserDetailsImpl userDetails, Long ddayId) {
+
+        Member member = userDetails.getMember();
+
+        Dday dday = ddayRepository.findById(ddayId).orElseThrow(
+                () -> new RuntimeException("해당 D-day가 존재하지 않습니다.")
+        );
+
+        if (!member.getEmail().equals(dday.getMember().getEmail())){
+            throw new RuntimeException("작성자만 수정할 수 있습니다.");
+        }
+
+        ddayRepository.deleteById(ddayId);
+
+        return "삭제되었습니다.";
+    }
+
+    private Long ddayCalculate (DdayRequestDto requestDto) throws ParseException {
+        String targetDay = requestDto.getTargetDay();
+        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
+
+        Date ddate = sdf.parse(targetDay);
+        Date todate = sdf.parse(today);
+        long Sec = (ddate.getTime() - todate.getTime()) / 1000; // 초
+//        long Min = (ddate.getTime() - todate.getTime()) / 60000; // 분
+//        long Hour = (ddate.getTime() - todate.getTime()) / 3600000; // 시
+        Long Days = (Sec / (24*60*60)); // 일자수
+        return Days;
+    }
+
 }
