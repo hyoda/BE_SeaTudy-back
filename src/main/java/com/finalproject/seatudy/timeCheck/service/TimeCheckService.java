@@ -221,7 +221,7 @@ public class TimeCheckService {
         String dayStudy = getCheckIn(userDetails).getDayStudyTime(); //총 공부시간
 
         if (lastCheckIn.getCheckOut() != null){
-            throw new RuntimeException("TRY_START");
+            throw new RuntimeException("TRY_START"); // 400 _ TRY_ONE_CKECKIN
         }
 
         if (findRank.isPresent()){

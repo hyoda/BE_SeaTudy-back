@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.finalproject.seatudy.timeCheck.util.Formatter.sdf;
 import static com.finalproject.seatudy.timeCheck.util.Formatter.sdtf;
+import static java.lang.String.format;
 
 public class CalendarUtil {
 
@@ -51,15 +52,17 @@ public class CalendarUtil {
             int allHH = Integer.parseInt(arrayFind[0]);
             int allMM = Integer.parseInt(arrayFind[1]);
             int allSS = allHH * 3600 + allMM * 60;
-            int alltotal = allSS + Integer.parseInt(arrayFind[2]); //분으로 환산
+            int alltotal = allSS + Integer.parseInt(arrayFind[2]); //초으로 환산
             total += alltotal;
         }
 
-        String totalHH = String.valueOf(total / 3600);
-        String totalMM = String.valueOf((total % 3600) / 60);
-        String totalSS = String.valueOf((total % 3600) % 60);
-        String totalSumTime = totalHH + ":" + totalMM + ":" + totalSS;
-        return totalSumTime;
+        int totalHH = (total / 3600);
+        int totalMM = ((total % 3600) / 60);
+        int totalSS = ((total % 3600) % 60);
+
+        return format("%02d:%02d:%02d",totalHH,totalMM,totalSS);
+//        String totalSumTime = totalHH + ":" + totalMM + ":" + totalSS;
+//        return totalSumTime;
     }
 
     // String yyyy-MM-dd HH:mm:ss 형식으로 return; 현재 시간
@@ -78,14 +81,6 @@ public class CalendarUtil {
         return sdtf.parse(setToday);
     }
 
-//    public static LocalDate localDate(String date) throws ParseException{
-//        LocalDate today = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-//        return today;
-//    }
-//
-//    public static String dateFormat(LocalDate localDate){
-//        return sdf.format(localDate.now());
-//    }
 
 //    public static void main(String[] args) throws ParseException {
 //        todayCalendarTime(Calendar.getInstance());
