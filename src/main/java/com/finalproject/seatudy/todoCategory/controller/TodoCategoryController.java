@@ -27,7 +27,7 @@ public class TodoCategoryController {
     }
 
     //todo 카테고리 수정
-    @PutMapping("/api/v1/todoCategories{todoCategoryId}")
+    @PutMapping("/api/v1/todoCategories/{todoCategoryId}")
     public ResponseDto<?> updateTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long todoCategoryId, @RequestBody TodoCategoryRequestDto todoCategoryRequestDto) {
         return todoCategoryService.updateTodoCategory(userDetails,todoCategoryId,todoCategoryRequestDto);
     }

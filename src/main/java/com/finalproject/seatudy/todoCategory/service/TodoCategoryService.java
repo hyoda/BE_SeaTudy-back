@@ -31,19 +31,22 @@ public class TodoCategoryService {
     private final MemberRepository memberRepository;
     public ResponseDto<?> createTodoCategory(UserDetailsImpl userDetails, TodoCategoryRequestDto todoCategoryRequestDto){
         Member member = userDetails.getMember();
-        TodoCategory todoCategory = TodoCategory.builder()
-                .member(member)
-                .categoryName(todoCategoryRequestDto.getCategoryName())
-                .build();
-        todoCategoryRepository.save(todoCategory);
+        if(todoCategoryRepository.findAllByMember(member).size()<5){
+            TodoCategory todoCategory = TodoCategory.builder()
+                    .member(member)
+                    .categoryName(todoCategoryRequestDto.getCategoryName())
+                    .build();
+            todoCategoryRepository.save(todoCategory);
 
-        TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
-                .categoryId(todoCategory.getCategoryId())
-                .categoryName(todoCategory.getCategoryName())
-                .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                .build();
+            TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
+                    .categoryId(todoCategory.getCategoryId())
+                    .categoryName(todoCategory.getCategoryName())
+                    .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
+                    .build();
 
-        return ResponseDto.success(todoCategoryResponseDto);
+            return ResponseDto.success(todoCategoryResponseDto);
+        }
+        return ResponseDto.fail("MAXIMUM_CATEGORY_EXCESS","카테고리는 최대 4개만 만들수있습니다.");
     }
 
     public ResponseDto<?> getTodoCategory(UserDetailsImpl userDetails) {
@@ -80,6 +83,8 @@ public class TodoCategoryService {
         TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
                 .categoryId(todoCategory.getCategoryId())
                 .categoryName(todoCategory.getCategoryName())
+                .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
+                .todoList(todoCategory.getTodoList().stream().map(TodoListResponseDto::new).collect(Collectors.toList()))
                 .build();
 
         return ResponseDto.success(todoCategoryResponseDto);
