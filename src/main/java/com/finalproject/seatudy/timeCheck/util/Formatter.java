@@ -9,4 +9,6 @@ public class Formatter {
     public static SimpleDateFormat sdtf = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss");
 
     public static SimpleDateFormat stf = new SimpleDateFormat("HH:mm:ss");
+
+    public static SimpleDateFormat time = new SimpleDateFormat("HHmmss");
 }

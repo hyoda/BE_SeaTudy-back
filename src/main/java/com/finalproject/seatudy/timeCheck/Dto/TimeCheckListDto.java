@@ -11,12 +11,20 @@ public class TimeCheckListDto {
     public static class CheckIn{
         private String checkIn;
         private String timeWatch;
+        private String time;
+        private int HH;
+        private int mm;
+        private int ss;
     }
     @Builder
     @Getter
     public static class CheckOut{
         private String checkOut;
         private String timeWatch;
+        private String time;
+        private int HH;
+        private int mm;
+        private int ss;
 //        private TodayLogDto todayLogDto;
     }
 
