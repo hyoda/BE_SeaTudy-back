@@ -2,7 +2,7 @@ package com.finalproject.seatudy.todoCategory.controller;
 
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.security.UserDetailsImpl;
-import com.finalproject.seatudy.todoCategory.dto.TodoCategoryRequestDto;
+import com.finalproject.seatudy.todoCategory.dto.request.TodoCategoryRequestDto;
 import com.finalproject.seatudy.todoCategory.service.TodoCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,6 +1,5 @@
-package com.finalproject.seatudy.todoCategory.dto;
+package com.finalproject.seatudy.todoCategory.dto.response;
 
-import com.finalproject.seatudy.entity.TodoList;
 import com.finalproject.seatudy.todolist.dto.response.TodoListResponseDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class TodoCategoryResponseDto {
-    private Long id;
+    private Long categoryId;
     private String categoryName;
     private MemberCateDto memberCateDto;
     private List<TodoListResponseDto> todoList;

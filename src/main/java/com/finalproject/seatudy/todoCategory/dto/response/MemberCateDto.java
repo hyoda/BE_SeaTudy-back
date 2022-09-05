@@ -1,4 +1,4 @@
-package com.finalproject.seatudy.todoCategory.dto;
+package com.finalproject.seatudy.todoCategory.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

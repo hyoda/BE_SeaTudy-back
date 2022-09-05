@@ -11,4 +11,7 @@ import java.util.List;
 public interface TodoCategoryRepository extends JpaRepository<TodoCategory, Long> {
 
     List<TodoCategory> findAllByMember(Member member);
+
+    //categoryId랑 Memberid를 동시에 만족하는 객체
+    TodoCategory findByCategoryIdAndMember(Long categoryId, Member member);
 }

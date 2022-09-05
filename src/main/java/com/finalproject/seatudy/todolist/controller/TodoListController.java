@@ -3,6 +3,7 @@ package com.finalproject.seatudy.todolist.controller;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
+import com.finalproject.seatudy.todolist.dto.request.TodoListUpdateDto;
 import com.finalproject.seatudy.todolist.service.TodoListService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,19 +33,19 @@ public class TodoListController {
 
     //todolist 내용 수정
     @PutMapping("/api/v1/todoLists/{todoId}")
-    public ResponseDto<?> updateTodoList(@PathVariable Long todoId,@RequestBody TodoListRequestDto todoListRequestDto){
-        return todolistService.updateTodoList(todoId,todoListRequestDto);
+    public ResponseDto<?> updateTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails,@PathVariable Long todoId,@RequestBody TodoListUpdateDto todoListUpdateDto){
+        return todolistService.updateTodoList(userDetails,todoId,todoListUpdateDto);
     }
     //todolist 삭제
     @DeleteMapping("/api/v1/todoLists/{todoId}")
-    public ResponseDto<?> deleteTodoList(@PathVariable Long todoId){
-        return todolistService.deleteTodoList(todoId);
+    public ResponseDto<?> deleteTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long todoId){
+        return todolistService.deleteTodoList(userDetails,todoId);
     }
 
     //todolist 완료
-    @PostMapping("/api/v1/{todoCategoryId}/todoLists/{todoId}")
-    public ResponseDto<?> completeTodoList(@PathVariable Long todoId){
-        return todolistService.completeTodoList(todoId);
+    @PostMapping("/api/v1/todoLists/{todoId}")
+    public ResponseDto<?> completeTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails,@PathVariable Long todoId){
+        return todolistService.completeTodoList(userDetails,todoId);
     }
 
     //선택한 연 월 의 todolist 불러오기

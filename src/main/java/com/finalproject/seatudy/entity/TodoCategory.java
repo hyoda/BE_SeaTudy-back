@@ -1,10 +1,8 @@
 package com.finalproject.seatudy.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.todoCategory.dto.TodoCategoryRequestDto;
+import com.finalproject.seatudy.todoCategory.dto.request.TodoCategoryRequestDto;
 import lombok.*;
-import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ import java.util.List;
 public class TodoCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long categoryId;
 
     private String categoryName;
 

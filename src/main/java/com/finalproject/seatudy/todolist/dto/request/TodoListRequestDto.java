@@ -3,7 +3,6 @@ package com.finalproject.seatudy.todolist.dto.request;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

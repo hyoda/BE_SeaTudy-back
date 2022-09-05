@@ -9,13 +9,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TodoListResponseDto {
-    private Long id;
+    private Long todoId;
     private String content;
     private String selectDate;
     private int done;
 
     public TodoListResponseDto(TodoList todoList) {
-        this.id = todoList.getTodoId();
+        this.todoId = todoList.getTodoId();
         this.content = todoList.getContent();
         this.selectDate = todoList.getSelectDate();
         this.done = todoList.getDone();

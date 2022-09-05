@@ -1,8 +1,7 @@
 package com.finalproject.seatudy.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
+import com.finalproject.seatudy.todolist.dto.request.TodoListUpdateDto;
 import lombok.*;
 import javax.persistence.*;
 
@@ -31,8 +30,8 @@ public class TodoList {
     @JoinColumn(name = "todo_category_id")
     private TodoCategory todoCategory;
 
-    public void update(TodoListRequestDto todoListRequestDto){
-        this.content = todoListRequestDto.getContent();
+    public void update(TodoListUpdateDto todoListUpdateDto){
+        this.content = todoListUpdateDto.getContent();
 
     }
 

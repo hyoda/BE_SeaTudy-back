@@ -7,9 +7,11 @@ import com.finalproject.seatudy.login.Member;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.todoCategory.repository.TodoCategoryRepository;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
+import com.finalproject.seatudy.todolist.dto.request.TodoListUpdateDto;
 import com.finalproject.seatudy.todolist.dto.response.TodoListResponseDto;
 import com.finalproject.seatudy.todolist.repository.TodoListRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,28 +27,14 @@ public class TodoListService {
     private final TodoListRepository todolistRepository;
     private final TodoCategoryRepository todoCategoryRepository;
 
-    //해당날짜 todo 리스트 전체조회
-//    public ResponseDto<?> getAlltodoList(TodoListRequestDto todoListRequestDto, HttpServletRequest request) {
-//        List<TodoList> list = todolistRepository.findAllBySelectDate(todoListRequestDto.getSelectDate());
-//        List<TodoListResponseDto> todoListResponseDto = new ArrayList<>();
-//
-//
-//        for (TodoList todoList : list) {
-//            todoListResponseDto.add(TodoListResponseDto.builder()
-//                    .id(todoList.getTodoId())
-//                    .content(todoList.getContent())
-//                    .build()
-//            );
-//        }
-//
-//        return ResponseDto.success(todoListResponseDto);
-//
-//    }
-
     //todo 리스트 생성
     public ResponseDto<?> createTodoList(UserDetailsImpl userDetails,Long todoCategoryId,TodoListRequestDto todoListRequestDto){
         Member member = userDetails.getMember();
         TodoCategory todoCategory = getTodoCategory(todoCategoryId);
+
+        if(!member.getEmail().equals(todoCategory.getMember().getEmail())){
+            throw new RuntimeException("사용자 권한이 없습니다.");
+        }
 
         TodoList todoList = TodoList.builder()
             .selectDate(todoListRequestDto.getSelectDate())
@@ -54,9 +42,9 @@ public class TodoListService {
             .todoCategory(todoCategory)
             .member(member)
             .build();
-    todolistRepository.save(todoList);
-    TodoListResponseDto todoListResponseDto = TodoListResponseDto.builder()
-            .id(todoList.getTodoId())
+        todolistRepository.save(todoList);
+        TodoListResponseDto todoListResponseDto = TodoListResponseDto.builder()
+            .todoId(todoList.getTodoId())
             .content(todoList.getContent())
             .selectDate(todoList.getSelectDate())
             .build();
@@ -66,26 +54,54 @@ public class TodoListService {
     }
 
     //todo 리스트 수정
-    public ResponseDto<?> updateTodoList(Long todoId,TodoListRequestDto todoListRequestDto){
-        TodoList todolist = todolistRepository.findById(todoId).orElseThrow(
-                () -> new NullPointerException("다시 해주세요!")
+    public ResponseDto<?> updateTodoList(UserDetailsImpl userDetails, Long todoId, TodoListUpdateDto todoListUpdateDto){
+        Member member = userDetails.getMember();
+        TodoList todoList = todolistRepository.findById(todoId).orElseThrow(
+                () -> new RuntimeException("해당 todolist가 없습니다")
         );
-        todolist.update(todoListRequestDto);
-        return ResponseDto.success(todolist);
+
+        if(!member.getEmail().equals(todoList.getMember().getEmail())){
+            throw new RuntimeException("사용자 권한이 없습니다.");
+        }
+
+        todoList.update(todoListUpdateDto);
+
+        TodoListResponseDto todoListResponseDto = TodoListResponseDto.builder()
+                .todoId(todoList.getTodoId())
+                .content(todoList.getContent())
+                .selectDate(todoList.getSelectDate())
+                .done(todoList.getDone())
+                .build();
+        return ResponseDto.success(todoListResponseDto);
 
     }
 
     //todo 리스트 삭제
-    public ResponseDto<?> deleteTodoList(Long todoId){
-        todolistRepository.deleteById(todoId);
+    public ResponseDto<?> deleteTodoList(UserDetailsImpl userDetails,Long todoId){
+//        Member member1 = memberRepository.findByEmail(userDetails.getMember().getEmail()).orElsethrow(
+//                () -> new RuntimeException("NON_EXISTENT_USER"));
+//
+        Member member = userDetails.getMember();
+        TodoList todolist = todolistRepository.findById(todoId).orElseThrow(
+                () -> new RuntimeException("해당 todolist가 없습니다.")
+        );
+        if(!member.getEmail().equals(todolist.getMember().getEmail())){
+            throw new RuntimeException("사용자 권한이 없습니다.");
+        }
+        todolist.getTodoCategory().getCategoryId();
+        todolistRepository.delete(todolist);
         return ResponseDto.success("삭제가 완료되었습니다.");
     }
 
     //todo 리스트 완료
-    public ResponseDto<?> completeTodoList(Long todoId) {
+    public ResponseDto<?> completeTodoList(UserDetailsImpl userDetails,Long todoId) {
+        Member member = userDetails.getMember();
         TodoList todoListDone = todolistRepository.findById(todoId).orElseThrow(
-                () -> new NullPointerException("해당 todolist가 없습니다")
+                () -> new RuntimeException("해당 todolist가 없습니다")
         );
+        if(!member.getEmail().equals(todoListDone.getMember().getEmail())){
+            throw new RuntimeException("사용자 권한이 없습니다.");
+        }
         if(todoListDone.getDone()==1){
             todoListDone.cancelDone();
             return ResponseDto.success("취소하였습니다");
@@ -100,7 +116,7 @@ public class TodoListService {
 
         for (TodoList todoList : todoLists){
             todoListResponseDto.add(TodoListResponseDto.builder()
-                    .id(todoList.getTodoId())
+                    .todoId(todoList.getTodoId())
                     .content(todoList.getContent())
                     .selectDate(todoList.getSelectDate())
                     .done(todoList.getDone())
@@ -113,7 +129,7 @@ public class TodoListService {
 
     private TodoCategory getTodoCategory(Long todoCategoryId){
         return todoCategoryRepository.findById(todoCategoryId).orElseThrow(
-                () -> new IllegalArgumentException("카테고리가 존재하지 않습니다.")
+                () -> new RuntimeException("카테고리가 존재하지 않습니다.")
         );
     }
 }
