@@ -24,7 +24,7 @@ public class TodoCategory {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "todoCategory")
+    @OneToMany(mappedBy = "todoCategory",fetch = FetchType.EAGER ,cascade=CascadeType.ALL, orphanRemoval = true)
     private List<TodoList> todoList = new ArrayList<>();
 
     public void update(TodoCategoryRequestDto todoCategoryRequestDto){
