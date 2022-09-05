@@ -1,7 +1,7 @@
 package com.finalproject.seatudy.timeCheck.entity;
 
 import com.finalproject.seatudy.Rank.Rank;
-import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.dto.login.Member;
 import lombok.*;
 
 import javax.persistence.*;

@@ -1,6 +1,6 @@
 package com.finalproject.seatudy.Rank;
 
-import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.dto.login.Member;
 import com.finalproject.seatudy.timeCheck.entity.TimeCheck;
 import lombok.*;
 

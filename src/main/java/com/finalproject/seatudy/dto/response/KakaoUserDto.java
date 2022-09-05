@@ -1,6 +1,5 @@
 package com.finalproject.seatudy.dto.response;
 
-import com.finalproject.seatudy.login.LoginType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

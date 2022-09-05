@@ -1,4 +1,4 @@
-package com.finalproject.seatudy.login;
+package com.finalproject.seatudy.dto.login;
 
 
 import com.finalproject.seatudy.dto.request.LoginRequestDto;

@@ -1,14 +1,14 @@
-package com.finalproject.seatudy.login.kakao;
+package com.finalproject.seatudy.dto.login.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.dto.response.KakaoUserDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
-import com.finalproject.seatudy.login.LoginType;
-import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.login.MemberRepository;
-import com.finalproject.seatudy.login.MemberService;
+import com.finalproject.seatudy.dto.login.LoginType;
+import com.finalproject.seatudy.dto.login.Member;
+import com.finalproject.seatudy.dto.login.MemberRepository;
+import com.finalproject.seatudy.dto.login.MemberService;
 import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

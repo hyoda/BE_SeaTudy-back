@@ -1,4 +1,4 @@
-package com.finalproject.seatudy.login;
+package com.finalproject.seatudy.dto.login;
 
 public enum LoginType {
     GENERAL,

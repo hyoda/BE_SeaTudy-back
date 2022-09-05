@@ -1,6 +1,6 @@
 package com.finalproject.seatudy.security;
 
-import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.dto.login.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

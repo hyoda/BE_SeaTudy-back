@@ -2,8 +2,8 @@ package com.finalproject.seatudy.timeCheck.service;
 
 import com.finalproject.seatudy.Rank.Rank;
 import com.finalproject.seatudy.Rank.RankRepository;
-import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.login.MemberRepository;
+import com.finalproject.seatudy.dto.login.Member;
+import com.finalproject.seatudy.dto.login.MemberRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.timeCheck.Dto.TimeCheckListDto;
 import com.finalproject.seatudy.timeCheck.entity.TimeCheck;

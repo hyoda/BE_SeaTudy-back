@@ -1,7 +1,7 @@
 package com.finalproject.seatudy.security.provider;
 
-import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.login.MemberRepository;
+import com.finalproject.seatudy.dto.login.Member;
+import com.finalproject.seatudy.dto.login.MemberRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
 import com.finalproject.seatudy.security.exception.ErrorCode;

@@ -1,11 +1,11 @@
-package com.finalproject.seatudy.login;
+package com.finalproject.seatudy.dto.login;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.finalproject.seatudy.dto.login.kakao.KaKaoMemberService;
 import com.finalproject.seatudy.dto.request.LoginRequestDto;
 import com.finalproject.seatudy.dto.request.MemberRequestDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
-import com.finalproject.seatudy.login.kakao.KaKaoMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

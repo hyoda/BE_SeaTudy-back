@@ -1,6 +1,6 @@
 package com.finalproject.seatudy.Rank;
 
-import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.dto.login.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
