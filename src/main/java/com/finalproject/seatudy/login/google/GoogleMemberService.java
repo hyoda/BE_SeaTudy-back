@@ -3,6 +3,7 @@ package com.finalproject.seatudy.login.google;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.seatudy.dto.response.NaverUserDto;
 import com.finalproject.seatudy.login.Member;
 import com.finalproject.seatudy.login.MemberRepository;
 import com.finalproject.seatudy.dto.response.GoogleUserDto;
@@ -38,10 +39,8 @@ public class GoogleMemberService {
 
     @Value("${security.oauth2.google.client_id}")
     private String GOOGLE_CLIENT_ID;
-
     @Value("${security.oauth2.google.client_secret}")
     private String GOOGLE_CLIENT_SECRET;
-
     @Value("${security.oauth2.google.redirect_uri}")
     private String GOOGLE_REDIRECT_URI;
 
@@ -50,7 +49,7 @@ public class GoogleMemberService {
 
         GoogleUserDto googleUserInfo = getGoogleUserInfo(googleACTokens);
 
-        Member googleMember = registerKakaoUserIfNeed(googleUserInfo);
+        Member googleMember = registerGoogleUserIfNeed(googleUserInfo);
 
         String googleAC = jwtTokenUtils.generateJwtToken(googleMember);
         memberService.tokenToHeaders(googleAC, response);
@@ -111,15 +110,19 @@ public class GoogleMemberService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-        Long id = jsonNode.get("sub").asLong();
+        Long googleId = jsonNode.get("sub").asLong();
         String email = jsonNode.get("email").asText();
         String name = jsonNode.get("name").asText();
 
-        return new GoogleUserDto(id, email, name);
+        return GoogleUserDto.builder()
+                .id(googleId)
+                .email(email)
+                .nickname(name)
+                .build();
     }
 
 
-    private Member registerKakaoUserIfNeed(GoogleUserDto googleUserInfo) {
+    private Member registerGoogleUserIfNeed(GoogleUserDto googleUserInfo) {
         String email = googleUserInfo.getEmail();
         String name = googleUserInfo.getNickname();
         Member googleMember = memberRepository.findByEmail(email).orElse(null);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.dto.response.KakaoUserDto;
+import com.finalproject.seatudy.dto.response.NaverUserDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.login.LoginType;
 import com.finalproject.seatudy.login.Member;
@@ -36,7 +37,6 @@ public class KaKaoMemberService {
 
     @Value("${security.oauth2.kakao.client_id}")
     private String KAKAO_CLIENT_ID;
-
     @Value("${security.oauth2.kakao.redirect_uri}")
     private String KAKAO_REDIRECT_URI;
 
@@ -58,6 +58,7 @@ public class KaKaoMemberService {
                         .id(kakaoMember.getMemberId())
                         .email(kakaoMember.getEmail())
                         .nickname(kakaoMember.getNickname())
+                        .birth(kakaoMember.getBirthday())
                         .build());
     }
 
@@ -106,9 +107,14 @@ public class KaKaoMemberService {
         long userId = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
-        String birthday = jsonNode.get("birthday").asText();
+        String birthday = jsonNode.get("kakao_account").get("birthday").asText();
 
-        return new KakaoUserDto(userId, email, nickname,birthday);
+        return KakaoUserDto.builder()
+                .id(userId)
+                .email(email)
+                .nickname(nickname)
+                .birth(birthday)
+                .build();
     }
 
     private Member registerKakaoUserIfNeed(KakaoUserDto kakaoUserDto) {

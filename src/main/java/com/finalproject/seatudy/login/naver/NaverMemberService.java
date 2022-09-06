@@ -40,9 +40,6 @@ public class NaverMemberService {
     @Value("${security.oauth2.naver.client_secret}")
     private String NAVER_CLIENT_SECRET;
 
-    @Value("${security.oauth2.naver.redirect_uri}")
-    private String NAVER_REDIRECT_URI;
-
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -54,18 +51,18 @@ public class NaverMemberService {
 
         NaverUserDto naverUserDto = getNaverUserInfo(naverACTokens);
 
-        Member naverMember = registerNaverUserIfNeed(naverUserDto);
+        Member member = registerNaverUserIfNeed(naverUserDto);
 
-        String naverAC = jwtTokenUtils.generateJwtToken(naverMember);
+        String naverAC = jwtTokenUtils.generateJwtToken(member);
         memberService.tokenToHeaders(naverAC, response);
 
-        log.info("네이버 로그인 완료: {}", naverMember.getEmail());
+        log.info("네이버 로그인 완료: {}", member.getEmail());
         return ResponseDto.success(
                 NaverUserDto.builder()
-                        .id(naverMember.getMemberId())
-                        .email(naverMember.getEmail())
-                        .nickname(naverMember.getNickname())
-                        .birth(naverMember.getBirthday())
+                        .id(member.getMemberId())
+                        .email(member.getEmail())
+                        .nickname(member.getNickname())
+                        .birth(member.getBirthday())
                         .build()
         );
     }
@@ -95,7 +92,6 @@ public class NaverMemberService {
 
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.get("access_token").asText();
-
     }
 
     private NaverUserDto getNaverUserInfo(String accessToken) throws JsonProcessingException {
@@ -114,11 +110,11 @@ public class NaverMemberService {
 
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        long naverId = jsonNode.get("response").get("id").asLong();
-        String email = jsonNode.get("response").get("email").asText();
-        String nickname = jsonNode.get("response").get("nickname").asText();
-        String birthday = jsonNode.get("response").get("birthday").asText();
+        JsonNode jsonNode = objectMapper.readTree(responseBody).get("response");
+        long naverId = jsonNode.get("id").asLong();
+        String email = jsonNode.get("email").asText();
+        String nickname = jsonNode.get("nickname").asText();
+        String birthday = jsonNode.get("birthday").asText();
 
         return NaverUserDto.builder()
                 .id(naverId)
@@ -132,12 +128,12 @@ public class NaverMemberService {
         String email = naverUserDto.getEmail();
         String nickname = naverUserDto.getNickname();
 
-        Member naverMember = memberRepository.findByEmail(email).orElse(null);
+        Member member = memberRepository.findByEmail(email).orElse(null);
 
-        if(naverMember == null) {
+        if(member == null) {
             String password = UUID.randomUUID().toString();
 
-            naverMember = Member.builder()
+            member = Member.builder()
                     .email(email)
                     .nickname(nickname)
                     .password(passwordEncoder.encode(password))
@@ -145,8 +141,9 @@ public class NaverMemberService {
                     .loginType(LoginType.NAVER)
                     .build();
 
-            memberRepository.save(naverMember);
+            memberRepository.save(member);
         }
-        return naverMember;
+
+        return member;
     }
 }
