@@ -114,8 +114,8 @@ public class TodoListService {
         return ResponseDto.success("할일을 완료하였습니다.");
     }
     //선택한 연 월 todolist 조회
-    public ResponseDto<?> getTodoList(UserDetailsImpl userDetails,TodoListRequestDto todoListRequestDto) {
-        List<TodoList> todoLists = todolistRepository.findAllBySelectDateContaining(todoListRequestDto.getSelectDate());
+    public ResponseDto<?> getTodoList(UserDetailsImpl userDetails,String selectDate) {
+        List<TodoList> todoLists = todolistRepository.findAllBySelectDateContaining(selectDate);
         List<TodoCateResDto> todoCateResDtos = new ArrayList<>();
 
         Member member1 = memberRepository.findByEmail(userDetails.getMember().getEmail()).orElseThrow(

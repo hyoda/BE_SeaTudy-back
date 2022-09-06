@@ -29,8 +29,8 @@ public class TodoCategoryController {
 
     //todo 카테고리 날짜별 조회
     @GetMapping("/api/v1/todoCategories/dates")
-    public ResponseDto<?> getTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody TodoListRequestDto todoListRequestDto){
-        return todoCategoryService.getTodoCategory(userDetails, todoListRequestDto);
+    public ResponseDto<?> getTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam String selectDate){
+        return todoCategoryService.getTodoCategory(userDetails, selectDate);
     }
 
     //todo 카테고리 수정

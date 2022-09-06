@@ -90,10 +90,10 @@ public class TodoCategoryService {
         return ResponseDto.success(todoCategoryResponseDto);
     }
 
-    public ResponseDto<?> getTodoCategory(UserDetailsImpl userDetails, TodoListRequestDto todoListRequestDto) {
+    public ResponseDto<?> getTodoCategory(UserDetailsImpl userDetails, String selectDate) {
         Member member = userDetails.getMember();
         List<TodoCategory> todoCategories= todoCategoryRepository.findAllByMember(member);
-        List<TodoList> todoLists = todoListRepository.findAllBySelectDateContaining(todoListRequestDto.getSelectDate());
+        List<TodoList> todoLists = todoListRepository.findAllBySelectDateContaining(selectDate);
         List<TodoCategoryResponseDto> todoCategoryResponseDtos = new ArrayList<>();
 
         for (TodoCategory todoCategory : todoCategories){
@@ -101,7 +101,8 @@ public class TodoCategoryService {
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                    .todoList(todoLists.stream().map(TodoListResDto::new).collect(Collectors.toList()))
+                    .todoList(todoLists.stream().filter(todoList -> todoList.getTodoCategory().equals(todoCategory))
+                            .map(TodoListResDto::new).collect(Collectors.toList()))
                     .build());
 
         }

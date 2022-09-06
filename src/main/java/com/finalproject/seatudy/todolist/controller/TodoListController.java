@@ -50,7 +50,7 @@ public class TodoListController {
 
     //선택한 연 월 의 todolist 불러오기
     @GetMapping("/api/v1/todoLists")
-    public ResponseDto<?> getTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails,@RequestBody TodoListRequestDto todoListRequestDto){
-        return todolistService.getTodoList(userDetails,todoListRequestDto);
+    public ResponseDto<?> getTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam String selectDate){
+        return todolistService.getTodoList(userDetails,selectDate);
     }
 }
