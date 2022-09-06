@@ -81,8 +81,6 @@ public class TimeCheckService {
 
         log.info("체크인 {}", timeWatch);
 
-        Date dateTimeWatch = stf.parse(timeWatch);
-        String timer = time.format(dateTimeWatch);
         String[] timeStamp = timeWatch.split(":"); //시, 분, 초 나누기
 
         int HH = Integer.parseInt(timeStamp[0]); //시
@@ -93,7 +91,6 @@ public class TimeCheckService {
         TimeCheckListDto.CheckIn checkIn = TimeCheckListDto.CheckIn.builder()
                 .checkIn(nowTime)
                 .timeWatch(timeWatch)
-                .time(timer)
                 .HH(HH)
                 .mm(mm)
                 .ss(ss)
@@ -243,13 +240,21 @@ public class TimeCheckService {
 
             log.info("체크아웃 {}", getCheckIn(userDetails));
 
+            String[] timeStamp = dayStudy.split(":"); //시, 분, 초 나누기
+
+            int HH = Integer.parseInt(timeStamp[0]); //시
+            int mm = Integer.parseInt(timeStamp[1]); //분
+            int ss = Integer.parseInt(timeStamp[2]); //초
+
             TimeCheckListDto.CheckOut checkOut = TimeCheckListDto.CheckOut.builder()
                     .checkOut(nowTime)
                     .timeWatch(dayStudy)
+                    .HH(HH)
+                    .mm(mm)
+                    .ss(ss)
                     .build();
 
             return checkOut;
-//            return getCheckIn(userDetails);
         }
 
         lastCheckIn.setCheckOut(nowTime);
@@ -262,8 +267,6 @@ public class TimeCheckService {
         lastCheckIn.setRank(rank);
         rankRepository.save(rank);
 
-        Date dateTimeWatch = stf.parse(dayStudy);
-        String timer = time.format(dateTimeWatch);
         String[] timeStamp = dayStudy.split(":"); //시, 분, 초 나누기
 
         int HH = Integer.parseInt(timeStamp[0]); //시
@@ -273,14 +276,12 @@ public class TimeCheckService {
         TimeCheckListDto.CheckOut checkOut = TimeCheckListDto.CheckOut.builder()
                 .checkOut(nowTime)
                 .timeWatch(dayStudy)
-                .time(timer)
                 .HH(HH)
                 .mm(mm)
                 .ss(ss)
                 .build();
 
         return checkOut;
-//        return getCheckIn(userDetails);
     }
 
     private String RankCheck(Optional<Rank> rank, Calendar today) throws ParseException{
