@@ -1,5 +1,6 @@
-package com.finalproject.seatudy.security;
+package com.finalproject.seatudy.security.config;
 
+import com.finalproject.seatudy.security.FilterSkipMatcher;
 import com.finalproject.seatudy.security.exception.AuthenticationFailHandler;
 import com.finalproject.seatudy.security.filter.JwtAuthFilter;
 import com.finalproject.seatudy.security.jwt.HeaderTokenExtractor;
