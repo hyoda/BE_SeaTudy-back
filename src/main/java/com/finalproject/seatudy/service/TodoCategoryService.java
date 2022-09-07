@@ -88,7 +88,7 @@ public class TodoCategoryService {
 
     public ResponseDto<?> getTodoCategory(UserDetailsImpl userDetails, String selectDate) {
         Member member = userDetails.getMember();
-        List<TodoCategory> todoCategories= todoCategoryRepository.findAllByMember(member);
+        List<TodoCategory> todoCategories= todoCategoryRepository.findAllBySelectDateContaining(selectDate);
         List<TodoList> todoLists = todoListRepository.findAllBySelectDateContaining(selectDate);
         List<TodoCategoryResponseDto> todoCategoryResponseDtos = new ArrayList<>();
 
