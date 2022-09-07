@@ -49,11 +49,11 @@ public class WebSecurityConfig {
         return (web) -> web
                 .ignoring()
                 .antMatchers( //Swagger 문서 읽기위한 요청허용
-                        "/swagger-ui/**",
+                        "/swagger-ui.html/**",
                         "/v2/api-docs",
                         "/webjars/**",
                         "/swagger-resources/**",
-                        "/swagger/**", "/h2-console/**");
+                        "/swagger/**", "/h2-console/**", "/swagger-ui.html");
     }
 
     @Bean

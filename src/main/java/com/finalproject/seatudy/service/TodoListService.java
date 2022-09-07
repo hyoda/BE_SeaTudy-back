@@ -121,7 +121,10 @@ public class TodoListService {
 
         for (TodoList todoList : todoLists){
             todoCateResDtos.add(TodoCateResDto.builder()
-                    .todoCateShortResDto(TodoCateShortResDto.builder().todoCategoryId(todoList.getTodoCategory().getCategoryId()).todoCategoryName(todoList.getTodoCategory().getCategoryName()).build())
+                    .todoCateShortResDto(TodoCateShortResDto.builder()
+                            .todoCategoryId(todoList.getTodoCategory().getCategoryId())
+                            .todoCategoryName(todoList.getTodoCategory().getCategoryName())
+                            .build())
                     .todoId(todoList.getTodoId())
                     .content(todoList.getContent())
                     .selectDate(todoList.getSelectDate())

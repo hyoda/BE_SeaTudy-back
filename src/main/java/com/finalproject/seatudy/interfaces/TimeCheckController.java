@@ -3,6 +3,7 @@ package com.finalproject.seatudy.interfaces;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.service.dto.response.TimeCheckListDto;
 import com.finalproject.seatudy.service.TimeCheckService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ public class TimeCheckController {
 
     // 체크인 start
     @PostMapping("/checkIns")
+    @ApiOperation(value = "체크인")
     public TimeCheckListDto.CheckIn checkIn(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
         log.info("요청 메서드 [POST] /api/v1/checkIns");
         return timeCheckService.checkIn(userDetails);
@@ -30,12 +32,14 @@ public class TimeCheckController {
 
     // 로그인된 사용자가 이미 start를 누른 상태라면, 값을 내려준다.
     @GetMapping("/checkIns")
+    @ApiOperation(value = "시간체크 조회")
     public TimeCheckListDto.TimeCheckDto getCheckIn(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
         log.info("요청 메서드 [GET] /api/checkIn");
         return timeCheckService.getCheckIn(userDetails);
     }
 
     @PostMapping("/checkOuts")
+    @ApiOperation(value = "체크아웃")
     public TimeCheckListDto.CheckOut checkOut(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException{
         log.info("요청 메서드 [POST] /api/checkOut");
         return timeCheckService.checkOut(userDetails);
