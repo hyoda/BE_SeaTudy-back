@@ -2,7 +2,7 @@ package com.finalproject.seatudy.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.domain.entity.Member;
 import io.jsonwebtoken.io.Decoders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

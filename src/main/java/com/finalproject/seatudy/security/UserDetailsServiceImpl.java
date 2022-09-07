@@ -1,7 +1,7 @@
 package com.finalproject.seatudy.security;
 
-import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.login.MemberRepository;
+import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

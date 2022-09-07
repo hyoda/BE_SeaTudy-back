@@ -1,7 +1,7 @@
 package com.finalproject.seatudy.security.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finalproject.seatudy.dto.response.ResponseDto;
+import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
