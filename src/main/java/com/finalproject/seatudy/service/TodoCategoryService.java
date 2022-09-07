@@ -105,4 +105,16 @@ public class TodoCategoryService {
         }
         return ResponseDto.success(todoCategoryResponseDtos);
     }
+
+    public ResponseDto<?> deleteTodoCategory(UserDetailsImpl userDetails, Long todoCategoryId) {
+        Member member = userDetails.getMember();
+        TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
+                () -> new RuntimeException("해당 카테고리가 없습니다.")
+        );
+        if(!member.getEmail().equals(todoCategory.getMember().getEmail())){
+            throw new RuntimeException("사용자 권한이 없습니다.");
+        }
+        todoCategoryRepository.delete(todoCategory);
+        return ResponseDto.success("삭제가 완료되었습니다.");
+    }
 }
