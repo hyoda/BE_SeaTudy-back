@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.dto.response.KakaoUserDto;
+import com.finalproject.seatudy.dto.response.NaverUserDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.login.LoginType;
 import com.finalproject.seatudy.login.Member;
@@ -13,10 +14,7 @@ import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,12 +33,10 @@ public class KaKaoMemberService {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
-
     private final JwtTokenUtils jwtTokenUtils;
 
     @Value("${security.oauth2.kakao.client_id}")
     private String KAKAO_CLIENT_ID;
-
     @Value("${security.oauth2.kakao.redirect_uri}")
     private String KAKAO_REDIRECT_URI;
 
@@ -61,6 +58,7 @@ public class KaKaoMemberService {
                         .id(kakaoMember.getMemberId())
                         .email(kakaoMember.getEmail())
                         .nickname(kakaoMember.getNickname())
+                        .birth(kakaoMember.getBirthday())
                         .build());
     }
 
@@ -75,8 +73,7 @@ public class KaKaoMemberService {
         body.add("redirect_uri", KAKAO_REDIRECT_URI);
         body.add("code",code);
 
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
-                new HttpEntity<>(body,headers);
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body,headers);
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
                 "https://kauth.kakao.com/oauth/token",
@@ -92,7 +89,6 @@ public class KaKaoMemberService {
     }
 
     public KakaoUserDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "Content-Type: application/json;charset=UTF-8");
@@ -111,10 +107,15 @@ public class KaKaoMemberService {
         long userId = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
+        String birthday = jsonNode.get("kakao_account").get("birthday").asText();
 
-        return new KakaoUserDto(userId, email, nickname);
+        return KakaoUserDto.builder()
+                .id(userId)
+                .email(email)
+                .nickname(nickname)
+                .birth(birthday)
+                .build();
     }
-
 
     private Member registerKakaoUserIfNeed(KakaoUserDto kakaoUserDto) {
         String email = kakaoUserDto.getEmail();

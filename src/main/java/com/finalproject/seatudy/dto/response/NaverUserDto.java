@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class KakaoUserDto {
+public class NaverUserDto {
     private Long id;
     private String email;
     private String nickname;
     private String birth;
 }
+

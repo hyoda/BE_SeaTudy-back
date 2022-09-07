@@ -85,14 +85,4 @@ public class MemberService {
         request.removeAttribute("Authorization");
         return ResponseDto.success("로그아웃되었습니다.");
     }
-
-    public void checkId(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
-
-
-        System.out.println("ACCESS TOKEN>>>>>" + authorization);
-
-
-
-    }
 }

@@ -108,15 +108,14 @@ public class WebSecurityConfig {
 
 
         //카카오톡 skipPathList
-        skipPathList.add("GET,/user/kakao/callback/**");
-        skipPathList.add("GET,/user/kakao/callback");
+        skipPathList.add("GET,/api/v1/members/kakaoLogin/**");
+        skipPathList.add("GET,/api/v1/members/naverLogin/**");
+        skipPathList.add("GET,/api/v1/members/googleLogin/**");
 
 
         //회원가입하기, 로그인 관련 skipPathList
         skipPathList.add("POST,/api/member/signup");  //회원가입
         skipPathList.add("POST,/api/member/login/**");
-
-
 
 
 //----------아래는 그대로----------
@@ -132,7 +131,6 @@ public class WebSecurityConfig {
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
-
 
 
     //cors
