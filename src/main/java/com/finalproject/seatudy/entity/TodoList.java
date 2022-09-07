@@ -1,14 +1,9 @@
 package com.finalproject.seatudy.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.finalproject.seatudy.login.Member;
+import com.finalproject.seatudy.todolist.dto.request.TodoListUpdateDto;
+import lombok.*;
+import javax.persistence.*;
 
 @Entity
 @AllArgsConstructor
@@ -27,4 +22,23 @@ public class TodoList {
 
     private int done;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "todo_category_id")
+    private TodoCategory todoCategory;
+
+    public void update(TodoListUpdateDto todoListUpdateDto){
+        this.content = todoListUpdateDto.getContent();
+
+    }
+
+    public void done() {
+        this.done = 1;
+    }
+    public void cancelDone() {
+        this.done = 0;
+    }
 }

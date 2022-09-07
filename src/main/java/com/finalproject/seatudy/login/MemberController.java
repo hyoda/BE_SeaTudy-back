@@ -25,6 +25,7 @@ public class MemberController {
   private final GoogleMemberService googleMemberService;
 
 
+
   @RequestMapping(value = "/api/member/signup", method = RequestMethod.POST)
   public ResponseDto<?> signup(@RequestBody @Valid MemberRequestDto memberRequestDto) {
     return memberService.createMember(memberRequestDto);
