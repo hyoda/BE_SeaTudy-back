@@ -9,4 +9,5 @@ import lombok.*;
 public class TodoCategoryRequestDto {
 
     private String categoryName;
+    private String selectDate;
 }

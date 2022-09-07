@@ -17,6 +17,6 @@ public enum UserErrorCode {
     private final String message;
 
     public ErrorResponse toErrorResponse() {
-        return new ErrorResponse(code, message,httpStatus);
+        return new ErrorResponse(code, message);
     }
 }

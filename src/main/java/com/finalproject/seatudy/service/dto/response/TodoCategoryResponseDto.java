@@ -13,6 +13,7 @@ import static com.finalproject.seatudy.service.dto.response.TodoListResponseDto.
 public class TodoCategoryResponseDto {
     private Long categoryId;
     private String categoryName;
+    private String selectDate;
     private MemberCateDto memberCateDto;
     private List<TodoListResDto> todoList;
 }

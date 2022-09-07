@@ -30,22 +30,21 @@ public class TodoCategoryService {
     private final TodoListRepository todoListRepository;
     public ResponseDto<?> createTodoCategory(UserDetailsImpl userDetails, TodoCategoryRequestDto todoCategoryRequestDto){
         Member member = userDetails.getMember();
-        if(todoCategoryRepository.findAllByMember(member).size()<5){
             TodoCategory todoCategory = TodoCategory.builder()
                     .member(member)
                     .categoryName(todoCategoryRequestDto.getCategoryName())
+                    .selectDate(todoCategoryRequestDto.getSelectDate())
                     .build();
             todoCategoryRepository.save(todoCategory);
 
             TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                     .build();
 
             return ResponseDto.success(todoCategoryResponseDto);
-        }
-        return ResponseDto.fail("MAXIMUM_CATEGORY_EXCESS","카테고리는 최대 4개만 만들수있습니다.");
     }
 
     public ResponseDto<?> getAllTodoCategory(UserDetailsImpl userDetails) {
@@ -57,6 +56,7 @@ public class TodoCategoryService {
             todoCategoryResponseDtos.add(TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                     .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
                     .build());
@@ -78,6 +78,7 @@ public class TodoCategoryService {
         TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
                 .categoryId(todoCategory.getCategoryId())
                 .categoryName(todoCategory.getCategoryName())
+                .selectDate(todoCategory.getSelectDate())
                 .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                 .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
                 .build();
@@ -95,6 +96,7 @@ public class TodoCategoryService {
             todoCategoryResponseDtos.add(TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                     .todoList(todoLists.stream().filter(todoList -> todoList.getTodoCategory().equals(todoCategory))
                             .map(TodoListResDto::new).collect(Collectors.toList()))

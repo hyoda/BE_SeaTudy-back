@@ -18,6 +18,7 @@ public class TodoCategory {
     private Long categoryId;
 
     private String categoryName;
+    private String selectDate;
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     @JoinColumn(name = "member_id",nullable = false)
