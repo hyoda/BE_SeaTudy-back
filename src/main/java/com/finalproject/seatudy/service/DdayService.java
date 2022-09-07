@@ -1,5 +1,7 @@
 package com.finalproject.seatudy.service;
 
+import com.finalproject.seatudy.domain.exception.UserErrorCode;
+import com.finalproject.seatudy.domain.exception.UserException;
 import com.finalproject.seatudy.service.dto.request.DdayRequestDto;
 import com.finalproject.seatudy.service.dto.response.DdayResponseDto;
 import com.finalproject.seatudy.domain.entity.Dday;
@@ -32,6 +34,10 @@ public class DdayService {
         Member member = userDetails.getMember();
 
         Long ddayResult = ddayCalculate(requestDto);
+
+        if (requestDto.getTitle().isEmpty()) {
+            throw new UserException(UserErrorCode.USER_DELETED);
+        }
 
         Dday dday = Dday.builder()
                 .title(requestDto.getTitle())
