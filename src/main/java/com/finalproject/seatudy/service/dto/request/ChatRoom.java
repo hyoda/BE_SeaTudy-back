@@ -14,10 +14,9 @@ public class ChatRoom implements Serializable {
     private String roomId;
     private String name;
 
-
     public static ChatRoom create(String name) {
         ChatRoom room = new ChatRoom();
-        room.roomId = UUID.randomUUID().toString();
+        room.roomId = name;
         room.name = name;
         return room;
     }

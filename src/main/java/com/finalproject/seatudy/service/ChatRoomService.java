@@ -3,18 +3,19 @@ package com.finalproject.seatudy.service;
 import com.finalproject.seatudy.service.dto.request.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Service
 @Slf4j
 @RequiredArgsConstructor
 public class ChatRoomService {
@@ -25,32 +26,23 @@ public class ChatRoomService {
     private HashOperations<String, String, ChatRoom> opsHashChatRoom;
     private Map<String, ChannelTopic> topics;
 
-
+    @Value("${static.chatroom.name}")
+    private List<String> ROOM_NAME_LIST;
 
     @PostConstruct
     public void init() {
         opsHashChatRoom = redisTemplate.opsForHash();
         topics = new HashMap<>();
-    }
 
-    public List<ChatRoom> findAllRooms() {
-        return opsHashChatRoom.values(CHAT_ROOMS);
-    }
-
-
-    public ChatRoom findRoomById(String id) {
-        return opsHashChatRoom.get(CHAT_ROOMS,id);
-    }
-
-    public ChatRoom createChatRoomDto(String name) {
-        ChatRoom chatRoom = ChatRoom.create(name);
-        opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-
-        return chatRoom;
+        for (String roomName : ROOM_NAME_LIST) {
+            ChatRoom chatRoom = ChatRoom.create(roomName);
+            opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
+        }
     }
 
     public void enterChatRoom(String roomId) {
         ChannelTopic topic = topics.get(roomId);
+        log.info("roomID: {}", roomId);
 
         if(topic == null) {
             topic = new ChannelTopic(roomId);
@@ -60,7 +52,7 @@ public class ChatRoomService {
     }
 
     public ChannelTopic getTopic(String roomId) {
+        log.info("roomID: {}", roomId);
         return topics.get(roomId);
     }
-
 }

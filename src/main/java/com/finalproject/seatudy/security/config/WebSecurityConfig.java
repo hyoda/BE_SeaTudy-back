@@ -54,7 +54,8 @@ public class WebSecurityConfig {
                         "/v2/api-docs",
                         "/webjars/**",
                         "/swagger-resources/**",
-                        "/swagger/**", "/h2-console/**");
+                        "/swagger/**", "/h2-console/**",
+                        "/api/v1/chat/connections/**");
     }
 
     @Bean
