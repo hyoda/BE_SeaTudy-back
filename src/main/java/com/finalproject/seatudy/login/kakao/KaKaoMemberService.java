@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.dto.response.KakaoUserDto;
-import com.finalproject.seatudy.dto.response.NaverUserDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.login.LoginType;
 import com.finalproject.seatudy.login.Member;

@@ -2,11 +2,11 @@ package com.finalproject.seatudy.login;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.finalproject.seatudy.login.kakao.KaKaoMemberService;
 import com.finalproject.seatudy.dto.request.LoginRequestDto;
 import com.finalproject.seatudy.dto.request.MemberRequestDto;
 import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.login.google.GoogleMemberService;
-import com.finalproject.seatudy.login.kakao.KaKaoMemberService;
 import com.finalproject.seatudy.login.naver.NaverMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,6 @@ public class MemberController {
   private final KaKaoMemberService kaKaoMemberService;
   private final NaverMemberService naverMemberService;
   private final GoogleMemberService googleMemberService;
-
 
 
   @RequestMapping(value = "/api/member/signup", method = RequestMethod.POST)
