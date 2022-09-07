@@ -10,7 +10,6 @@ import com.finalproject.seatudy.todoCategory.dto.response.TodoCateShortResDto;
 import com.finalproject.seatudy.todoCategory.repository.TodoCategoryRepository;
 import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
 import com.finalproject.seatudy.todolist.dto.request.TodoListUpdateDto;
-import com.finalproject.seatudy.todolist.dto.response.TodoListResponseDto;
 import com.finalproject.seatudy.todolist.repository.TodoListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -82,9 +81,7 @@ public class TodoListService {
 
     //todo 리스트 삭제
     public ResponseDto<?> deleteTodoList(UserDetailsImpl userDetails,Long todoId){
-//        Member member1 = memberRepository.findByEmail(userDetails.getMember().getEmail()).orElsethrow(
-//                () -> new RuntimeException("NON_EXISTENT_USER"));
-//
+
         Member member = userDetails.getMember();
         TodoList todolist = todolistRepository.findById(todoId).orElseThrow(
                 () -> new RuntimeException("해당 todolist가 없습니다.")
@@ -118,7 +115,7 @@ public class TodoListService {
         List<TodoList> todoLists = todolistRepository.findAllBySelectDateContaining(selectDate);
         List<TodoCateResDto> todoCateResDtos = new ArrayList<>();
 
-        Member member1 = memberRepository.findByEmail(userDetails.getMember().getEmail()).orElseThrow(
+        Member member = memberRepository.findByEmail(userDetails.getMember().getEmail()).orElseThrow(
                 () -> new RuntimeException("NOT_EXISTENT_USER")
         );
 

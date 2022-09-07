@@ -4,7 +4,6 @@ import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.todoCategory.dto.request.TodoCategoryRequestDto;
 import com.finalproject.seatudy.todoCategory.service.TodoCategoryService;
-import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

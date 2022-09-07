@@ -4,17 +4,13 @@ import com.finalproject.seatudy.dto.response.ResponseDto;
 import com.finalproject.seatudy.entity.TodoCategory;
 import com.finalproject.seatudy.entity.TodoList;
 import com.finalproject.seatudy.login.Member;
-import com.finalproject.seatudy.login.MemberRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.todoCategory.dto.response.MemberCateDto;
 import com.finalproject.seatudy.todoCategory.dto.request.TodoCategoryRequestDto;
 import com.finalproject.seatudy.todoCategory.dto.response.TodoCategoryResponseDto;
 import com.finalproject.seatudy.todoCategory.repository.TodoCategoryRepository;
-import com.finalproject.seatudy.todolist.dto.request.TodoListRequestDto;
-import com.finalproject.seatudy.todolist.dto.response.TodoListResponseDto;
 import com.finalproject.seatudy.todolist.repository.TodoListRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +28,6 @@ public class TodoCategoryService {
 
     private final TodoCategoryRepository todoCategoryRepository;
     private final TodoListRepository todoListRepository;
-    private final MemberRepository memberRepository;
     public ResponseDto<?> createTodoCategory(UserDetailsImpl userDetails, TodoCategoryRequestDto todoCategoryRequestDto){
         Member member = userDetails.getMember();
         if(todoCategoryRepository.findAllByMember(member).size()<5){

@@ -18,13 +18,6 @@ public class TodoListController {
         this.todolistService = todolistService;
     }
 
-    //해당 날짜 todolist 불러오기
-//    @GetMapping("/api/v1/todoLists/selectday")
-//    public ResponseDto<?> getAlltodoList(@RequestBody TodoListRequestDto todoListRequestDto, HttpServletRequest request ){
-//        return todolistService.getAlltodoList(todoListRequestDto, request);
-//    }
-
-
     //해당날짜에 todolist 만들기
     @PostMapping("/api/v1/{todoCategoryId}/todoLists")
     public ResponseDto<?> createTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long todoCategoryId, @RequestBody TodoListRequestDto todoListRequestDto){

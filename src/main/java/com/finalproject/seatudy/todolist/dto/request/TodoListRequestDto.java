@@ -2,8 +2,8 @@ package com.finalproject.seatudy.todolist.dto.request;
 
 import lombok.*;
 
-@Getter
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TodoListRequestDto {

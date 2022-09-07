@@ -1,12 +1,11 @@
 package com.finalproject.seatudy.todoCategory.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
 @Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberCateDto {
     private Long memberId;
     private String email;
