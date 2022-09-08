@@ -9,4 +9,5 @@ import lombok.*;
 public class TodoCateShortResDto {
     private Long todoCategoryId;
     private String todoCategoryName;
+    private String selectDate;
 }

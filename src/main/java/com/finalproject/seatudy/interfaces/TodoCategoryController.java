@@ -49,4 +49,10 @@ public class TodoCategoryController {
                                              @RequestBody TodoCategoryRequestDto todoCategoryRequestDto) {
         return todoCategoryService.updateTodoCategory(userDetails,todoCategoryId,todoCategoryRequestDto);
     }
+
+    //todo 카테고리 삭제
+    @DeleteMapping("/api/v1/todoCategories/{todoCategoryId}")
+    public ResponseDto<?> deleteTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long todoCategoryId){
+        return todoCategoryService.deleteTodoCategory(userDetails, todoCategoryId);
+    }
 }
