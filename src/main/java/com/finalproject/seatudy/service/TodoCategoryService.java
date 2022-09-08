@@ -30,22 +30,21 @@ public class TodoCategoryService {
     private final TodoListRepository todoListRepository;
     public ResponseDto<?> createTodoCategory(UserDetailsImpl userDetails, TodoCategoryRequestDto todoCategoryRequestDto){
         Member member = userDetails.getMember();
-        if(todoCategoryRepository.findAllByMember(member).size()<5){
             TodoCategory todoCategory = TodoCategory.builder()
                     .member(member)
                     .categoryName(todoCategoryRequestDto.getCategoryName())
+                    .selectDate(todoCategoryRequestDto.getSelectDate())
                     .build();
             todoCategoryRepository.save(todoCategory);
 
             TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                     .build();
 
             return ResponseDto.success(todoCategoryResponseDto);
-        }
-        return ResponseDto.fail("MAXIMUM_CATEGORY_EXCESS","카테고리는 최대 4개만 만들수있습니다.");
     }
 
     public ResponseDto<?> getAllTodoCategory(UserDetailsImpl userDetails) {
@@ -57,6 +56,7 @@ public class TodoCategoryService {
             todoCategoryResponseDtos.add(TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                     .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
                     .build());
@@ -78,6 +78,7 @@ public class TodoCategoryService {
         TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
                 .categoryId(todoCategory.getCategoryId())
                 .categoryName(todoCategory.getCategoryName())
+                .selectDate(todoCategory.getSelectDate())
                 .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                 .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
                 .build();
@@ -87,7 +88,7 @@ public class TodoCategoryService {
 
     public ResponseDto<?> getTodoCategory(UserDetailsImpl userDetails, String selectDate) {
         Member member = userDetails.getMember();
-        List<TodoCategory> todoCategories= todoCategoryRepository.findAllByMember(member);
+        List<TodoCategory> todoCategories= todoCategoryRepository.findAllBySelectDateContaining(selectDate);
         List<TodoList> todoLists = todoListRepository.findAllBySelectDateContaining(selectDate);
         List<TodoCategoryResponseDto> todoCategoryResponseDtos = new ArrayList<>();
 
@@ -95,6 +96,7 @@ public class TodoCategoryService {
             todoCategoryResponseDtos.add(TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())
                     .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
                     .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
                     .todoList(todoLists.stream().filter(todoList -> todoList.getTodoCategory().equals(todoCategory))
                             .map(TodoListResDto::new).collect(Collectors.toList()))
@@ -102,5 +104,17 @@ public class TodoCategoryService {
 
         }
         return ResponseDto.success(todoCategoryResponseDtos);
+    }
+
+    public ResponseDto<?> deleteTodoCategory(UserDetailsImpl userDetails, Long todoCategoryId) {
+        Member member = userDetails.getMember();
+        TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
+                () -> new RuntimeException("해당 카테고리가 없습니다.")
+        );
+        if(!member.getEmail().equals(todoCategory.getMember().getEmail())){
+            throw new RuntimeException("사용자 권한이 없습니다.");
+        }
+        todoCategoryRepository.delete(todoCategory);
+        return ResponseDto.success("삭제가 완료되었습니다.");
     }
 }

@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class DdayRequestDto {
     private String title;
     private String targetDay;
-
 }
