@@ -18,6 +18,7 @@ public class TodoListResponseDto {
         public TodoListResDto(TodoList todoList) {
             this.todoId = todoList.getTodoId();
             this.content = todoList.getContent();
+            this.selectDate = todoList.getSelectDate();
             this.done = todoList.getDone();
         }
     }
