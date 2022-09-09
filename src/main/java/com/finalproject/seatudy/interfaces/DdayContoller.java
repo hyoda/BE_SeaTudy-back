@@ -35,7 +35,7 @@ public class DdayContoller {
 
     @PutMapping("/ddays/{ddayId}")
     @ApiOperation(value = "D-day 수정")
-    @ApiImplicitParam(name = "D-dayId", value = "D-day 아이디")
+    @ApiImplicitParam(name = "ddayId", value = "D-day 아이디")
     public DdayResponseDto updateDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                       @PathVariable Long ddayId,
                                       @RequestBody DdayRequestDto requestDto) throws ParseException{
@@ -44,7 +44,7 @@ public class DdayContoller {
 
     @DeleteMapping("/ddays/{ddayId}")
     @ApiOperation(value = "D-day 삭제")
-    @ApiImplicitParam(name = "D-dayId", value = "D-day 아이디")
+    @ApiImplicitParam(name = "ddayId", value = "D-day 아이디")
     public String deleteDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
                             @PathVariable Long ddayId){
         return ddayService.deleteDday(userDetails, ddayId);

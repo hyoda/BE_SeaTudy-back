@@ -1,7 +1,5 @@
 package com.finalproject.seatudy.service;
 
-import com.finalproject.seatudy.domain.exception.UserErrorCode;
-import com.finalproject.seatudy.domain.exception.UserException;
 import com.finalproject.seatudy.service.dto.request.DdayRequestDto;
 import com.finalproject.seatudy.service.dto.response.DdayResponseDto;
 import com.finalproject.seatudy.domain.entity.Dday;
@@ -36,7 +34,7 @@ public class DdayService {
         Long ddayResult = ddayCalculate(requestDto);
 
         if (requestDto.getTitle().isEmpty()) {
-            throw new UserException(UserErrorCode.USER_DELETED);
+            throw new RuntimeException("타이틀을 입력해야 합니다.");
         }
 
         Dday dday = Dday.builder()

@@ -50,9 +50,11 @@ public class TodoCategoryController {
         return todoCategoryService.updateTodoCategory(userDetails,todoCategoryId,todoCategoryRequestDto);
     }
 
-    //todo 카테고리 삭제
-    @DeleteMapping("/api/v1/todoCategories/{todoCategoryId}")
-    public ResponseDto<?> deleteTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long todoCategoryId){
+    @DeleteMapping("/todoCategories/{todoCategoryId}")
+    @ApiOperation(value = "할일 카테고리 삭제")
+    @ApiImplicitParam(name = "todoCategoryId", value = "할일 카테고리 아이디")
+    public ResponseDto<?> deleteTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                             @PathVariable Long todoCategoryId){
         return todoCategoryService.deleteTodoCategory(userDetails, todoCategoryId);
     }
 }

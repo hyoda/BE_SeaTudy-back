@@ -39,6 +39,8 @@ public class TodoListService {
             throw new RuntimeException("사용자 권한이 없습니다.");
         }
 
+        // todo 리스트 selectDate랑 todoCategory selectDate랑 같아야함(조건문 생성) -> 아니면 오류
+
         TodoList todoList = TodoList.builder()
             .selectDate(todoListRequestDto.getSelectDate())
             .content(todoListRequestDto.getContent())
@@ -124,6 +126,7 @@ public class TodoListService {
                     .todoCateShortResDto(TodoCateShortResDto.builder()
                             .todoCategoryId(todoList.getTodoCategory().getCategoryId())
                             .todoCategoryName(todoList.getTodoCategory().getCategoryName())
+                            .selectDate(todoList.getTodoCategory().getSelectDate())
                             .build())
                     .todoId(todoList.getTodoId())
                     .content(todoList.getContent())
