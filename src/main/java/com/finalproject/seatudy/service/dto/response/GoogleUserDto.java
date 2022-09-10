@@ -13,4 +13,5 @@ public class GoogleUserDto {
     private Long id;
     private String email;
     private String nickname;
+    private Long point;
 }

@@ -229,6 +229,10 @@ public class TimeCheckService {
 
         String dayStudy = getCheckIn(userDetails).getDayStudyTime(); //총 공부시간
 
+        List<Rank> allMemberList = rankRepository.findByMember(member);
+
+        String total = totalTime(allMemberList);
+
         if (lastCheckIn.getCheckOut() != null){
             throw new RuntimeException("TRY_START"); // 400 _ TRY_ONE_CKECKIN
         }
@@ -237,6 +241,7 @@ public class TimeCheckService {
             lastCheckIn.setCheckOut(nowTime);
             lastCheckIn.setRank(findCheckIns.get(0).getRank());
             findRank.get().setDayStudy(dayStudy);
+            findRank.get().setTotalStudy(total);
 
             log.info("체크아웃 {}", getCheckIn(userDetails));
 
@@ -260,6 +265,7 @@ public class TimeCheckService {
         lastCheckIn.setCheckOut(nowTime);
         Rank rank = Rank.builder()
                 .dayStudy(dayStudy)
+                .totalStudy(total)
                 .date(setToday)
                 .member(member)
                 .timeChecks(findCheckIns)

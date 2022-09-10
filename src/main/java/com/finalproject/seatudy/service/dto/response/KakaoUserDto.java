@@ -14,4 +14,5 @@ public class KakaoUserDto {
     private String email;
     private String nickname;
     private String birth;
+    private Long point;
 }

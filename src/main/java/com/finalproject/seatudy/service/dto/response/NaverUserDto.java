@@ -14,5 +14,6 @@ public class NaverUserDto {
     private String email;
     private String nickname;
     private String birth;
+    private Long point;
 }
 

@@ -3,6 +3,8 @@ package com.finalproject.seatudy.infra;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.seatudy.domain.entity.Rank;
+import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.service.dto.response.NaverUserDto;
 import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import com.finalproject.seatudy.domain.LoginType;
@@ -24,7 +26,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.UUID;
+
+import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
 
 @Slf4j
 @Service
@@ -44,6 +49,7 @@ public class NaverMemberService {
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtils;
+    private final RankRepository rankRepository;
 
 
     public ResponseDto<?> naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
@@ -56,6 +62,10 @@ public class NaverMemberService {
         String naverAC = jwtTokenUtils.generateJwtToken(member);
         memberService.tokenToHeaders(naverAC, response);
 
+        List<Rank> allMemberList = rankRepository.findByMember(member);
+
+        Long point = totalPoint(allMemberList);
+
         log.info("네이버 로그인 완료: {}", member.getEmail());
         return ResponseDto.success(
                 NaverUserDto.builder()
@@ -63,6 +73,7 @@ public class NaverMemberService {
                         .email(member.getEmail())
                         .nickname(member.getNickname())
                         .birth(member.getBirthday())
+                        .point(point)
                         .build()
         );
     }

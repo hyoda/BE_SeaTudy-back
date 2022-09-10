@@ -3,6 +3,8 @@ package com.finalproject.seatudy.infra;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.seatudy.domain.entity.Rank;
+import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.service.dto.response.KakaoUserDto;
 import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import com.finalproject.seatudy.domain.LoginType;
@@ -21,7 +23,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.UUID;
+
+import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
 
 
 @Slf4j
@@ -33,6 +38,7 @@ public class KaKaoMemberService {
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtils;
+    private final RankRepository rankRepository;
 
     @Value("${security.oauth2.kakao.client_id}")
     private String KAKAO_CLIENT_ID;
@@ -51,6 +57,10 @@ public class KaKaoMemberService {
         String kakaoAC = jwtTokenUtils.generateJwtToken(kakaoMember);
         memberService.tokenToHeaders(kakaoAC, response);
 
+        List<Rank> allMemberList = rankRepository.findByMember(kakaoMember);
+
+        Long point = totalPoint(allMemberList);
+
         log.info("카카오 로그인 완료: {}",kakaoMember.getEmail());
         return ResponseDto.success(
                 KakaoUserDto.builder()
@@ -58,6 +68,7 @@ public class KaKaoMemberService {
                         .email(kakaoMember.getEmail())
                         .nickname(kakaoMember.getNickname())
                         .birth(kakaoMember.getBirthday())
+                        .point(point)
                         .build());
     }
 

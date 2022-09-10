@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.entity.Rank;
 import com.finalproject.seatudy.domain.repository.MemberRepository;
+import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.service.dto.response.GoogleUserDto;
 import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
 import com.finalproject.seatudy.domain.LoginType;
@@ -24,7 +26,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.UUID;
+
+import static com.finalproject.seatudy.service.util.CalendarUtil.*;
 
 @Service
 @Slf4j
@@ -35,6 +40,7 @@ public class GoogleMemberService {
     private final MemberService memberService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtils;
+    private final RankRepository rankRepository;
 
     @Value("${security.oauth2.google.client_id}")
     private String GOOGLE_CLIENT_ID;
@@ -53,12 +59,17 @@ public class GoogleMemberService {
         String googleAC = jwtTokenUtils.generateJwtToken(googleMember);
         memberService.tokenToHeaders(googleAC, response);
 
+        List<Rank> allMemberList = rankRepository.findByMember(googleMember);
+
+        Long point = totalPoint(allMemberList);
+
         log.info("구글 로그인 완료: {}",googleMember.getEmail());
         return ResponseDto.success(
                 GoogleUserDto.builder()
                         .id(googleMember.getMemberId())
                         .email(googleMember.getEmail())
                         .nickname(googleMember.getNickname())
+                        .point(point)
                         .build());
     }
 
