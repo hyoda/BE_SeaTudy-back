@@ -34,7 +34,8 @@ public class JwtDecoder {
         return decodedJWT.getSubject();
     }
 
-    private Optional<DecodedJWT> isValidToken(String token){
+
+    public Optional<DecodedJWT> isValidToken(String token){
 
         DecodedJWT jwt = null;
         try{

@@ -44,6 +44,10 @@ public class TodoListService {
             return ResponseDto.fail("MISMATCH_SELECT_DATE", "카테고리의 날짜와 일치하지 않습니다.");
         }
 
+        // todo 리스트 selectDate랑 todoCategory selectDate랑 같아야함(조건문 생성) -> 아니면 오류
+        if(!todoListRequestDto.getSelectDate().equals(todoCategory.getSelectDate())){
+            return ResponseDto.fail("MISMATCH_SELECT_DATE","카테고리의 날짜와 일치하지 않습니다.");
+        }
         TodoList todoList = TodoList.builder()
                 .selectDate(todoListRequestDto.getSelectDate())
                 .content(todoListRequestDto.getContent())
