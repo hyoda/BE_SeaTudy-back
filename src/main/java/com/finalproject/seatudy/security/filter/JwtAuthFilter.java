@@ -1,10 +1,9 @@
 package com.finalproject.seatudy.security.filter;
 
-import com.finalproject.seatudy.security.exception.CustomException;
-import com.finalproject.seatudy.security.exception.ErrorCode;
 import com.finalproject.seatudy.security.jwt.HeaderTokenExtractor;
 import com.finalproject.seatudy.security.jwt.JwtPreProcessingToken;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -34,12 +33,12 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException, IOException {
-        log.debug("JWT_FILTER : attemptAuthentication 실행");
+                                                HttpServletResponse response) throws AuthenticationException {
+        log.info("JWT_FILTER : attemptAuthentication 실행");
         // JWT 값을 담아주는 변수 TokenPayload
         String tokenPayload = request.getHeader("Authorization");
         if (tokenPayload == null || tokenPayload.equals("")) {
-            throw new CustomException(ErrorCode.AUTH_TOKEN_NOT_FOUND);
+            throw new AuthenticationCredentialsNotFoundException("토큰이 존재하지 않습니다");
         }
 
         JwtPreProcessingToken jwtToken = new JwtPreProcessingToken(extractor.extract(tokenPayload, request));

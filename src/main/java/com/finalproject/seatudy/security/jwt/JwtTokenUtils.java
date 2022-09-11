@@ -16,10 +16,8 @@ public final class JwtTokenUtils {
     private Long JWT_TOKEN_VALID_MILLI_SEC;
     @Value("${jwt.secret}")
     public String JWT_SECRET;
-
     @Value("${jwt.issuer}")
     public String CLAIM_JWT_ISSUER;
-
 
     public String generateJwtToken(Member member){
         String token = null;
@@ -34,7 +32,6 @@ public final class JwtTokenUtils {
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
         return token;
     }
 
