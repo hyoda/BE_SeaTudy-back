@@ -22,13 +22,14 @@ public class JwtDecoder {
     private String JWT_SECRET;
 
     public String decodeUsername(String token){
-        DecodedJWT decodedJWT = isValidToken(token).orElseThrow(()->new AuthenticationServiceException("토큰이 유효하지 않습니다"));
+        DecodedJWT decodedJWT = isValidToken(token).orElseThrow(
+                () -> new AuthenticationServiceException("토큰이 유효하지 않습니다"));
         Date expiredDate = decodedJWT.getExpiresAt();
-
 
         Date now = new Date();
         if(expiredDate.before(now)){
-            throw new AuthenticationServiceException("유효시간이 지난 토큰입니다 ");
+            log.error("토큰 유효시간이 만료되었습니다. (member: {})", decodedJWT.getSubject());
+            throw new AuthenticationServiceException("토큰 유효시간이 만료되었습니다.");
         }
         return decodedJWT.getSubject();
     }

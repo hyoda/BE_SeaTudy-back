@@ -17,7 +17,7 @@ import java.io.IOException;
 public class AuthenticationFailHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.error("인증실패");
+        log.error("토큰인증에 실패하였습니다.");
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(
                 new ObjectMapper().writeValueAsString(

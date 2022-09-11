@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.security.exception;
 
+import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,12 +21,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorResponse(errorCode));
     }
 
-    private ErrorResponse makeErrorResponse(ErrorCode errorCode){
+    private ResponseDto<?> makeErrorResponse(ErrorCode errorCode){
 
-        return ErrorResponse.builder()
-                .code(errorCode.name())
-                .message(errorCode.getMessage())
-                .build();
+        return ResponseDto.fail(errorCode.name(),errorCode.getMessage());
 
     }
 }

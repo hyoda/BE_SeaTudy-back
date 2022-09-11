@@ -1,6 +1,7 @@
 package com.finalproject.seatudy.service;
 
 import com.finalproject.seatudy.security.exception.CustomException;
+import com.finalproject.seatudy.security.exception.ErrorCode;
 import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import com.finalproject.seatudy.domain.entity.TodoCategory;
 import com.finalproject.seatudy.domain.entity.TodoList;
@@ -140,7 +141,7 @@ public class TodoListService {
 
     private TodoCategory getTodoCategory(Long todoCategoryId){
         return todoCategoryRepository.findById(todoCategoryId).orElseThrow(
-                () -> new RuntimeException("카테고리가 존재하지 않습니다.")
+                () -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND)
         );
     }
 }
