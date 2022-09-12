@@ -42,7 +42,7 @@ public class TodoListService {
 
         // todo 리스트 selectDate랑 todoCategory selectDate랑 같아야함(조건문 생성) -> 아니면 오류
         if(!todoListRequestDto.getSelectDate().equals(todoCategory.getSelectDate())){
-            return ResponseDto.fail("MISMATCH_SELECT_DATE","카테고리의 날짜와 일치하지 않습니다.");
+            throw new CustomException(MISMATCH_SELECT_DATE);
         }
         if(todoCategory.getMember().getEmail().equals(member.getEmail())){
             TodoList todoList = TodoList.builder()
@@ -60,7 +60,7 @@ public class TodoListService {
                     .build();
             return ResponseDto.success(todoListCateResDto);
         }
-        return ResponseDto.fail("TODOLIST_FORBIDDEN_POST", "현재 사용자는 해당 TODO리스트를 생성할 수 없습니다.");
+        throw new CustomException(TODOLIST_FORBIDDEN_POST);
     }
 
     //todo 리스트 수정
@@ -84,7 +84,7 @@ public class TodoListService {
                     .build();
             return ResponseDto.success(todoListCateResDto);
         }
-        return ResponseDto.fail("TODOLIST_FORBIDDEN_UPDATE","현재 사용자는 해당 TODO리스트를 수정할 수 없습니다.");
+        throw new CustomException(TODOLIST_FORBIDDEN_UPDATE);
 
     }
 
@@ -92,7 +92,7 @@ public class TodoListService {
     public ResponseDto<?> deleteTodoList(UserDetailsImpl userDetails,Long todoId){
 
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new CustomException(TODOLIST_FORBIDDEN_DELETE)
+                () -> new CustomException(USER_NOT_FOUND)
         );
         TodoList todolist = todolistRepository.findById(todoId).orElseThrow(
                 () -> new CustomException(TODOLIST_NOT_FOUND)
@@ -102,7 +102,7 @@ public class TodoListService {
             todolistRepository.delete(todolist);
             return ResponseDto.success("삭제가 완료되었습니다.");
         }
-        return ResponseDto.fail("TODOLIST_FORBIDDEN_DELETE","현재 사용자는 해당 카테고리를 수정할 수 없습니다.");
+        throw new CustomException(TODOLIST_FORBIDDEN_DELETE);
     }
 
     //todo 리스트 완료
@@ -136,7 +136,7 @@ public class TodoListService {
                     .build();
             return ResponseDto.success(todoListCateResDto);
         }
-        return ResponseDto.fail("TODOLIST_FORBIDDEN_COMPLETE", "현재 사용자는 해당 TODO리스트를 완료할 수 없습니다.");
+        throw new CustomException(TODOLIST_FORBIDDEN_COMPLETE);
     }
     //선택한 연 월 todolist 조회
     public ResponseDto<?> getTodoList(UserDetailsImpl userDetails,String selectDate) {
