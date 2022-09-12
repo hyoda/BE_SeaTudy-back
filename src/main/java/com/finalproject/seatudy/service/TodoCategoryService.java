@@ -48,6 +48,7 @@ public class TodoCategoryService {
                 .categoryName(todoCategory.getCategoryName())
                 .selectDate(todoCategory.getSelectDate())
                 .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
+                .todoList(new ArrayList<>())
                 .build();
 
         return ResponseDto.success(todoCategoryResponseDto);
