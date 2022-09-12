@@ -56,6 +56,7 @@ public class TodoListService {
                     .todoId(todoList.getTodoId())
                     .content(todoList.getContent())
                     .selectDate(todoList.getSelectDate())
+                    .categoryId(todoList.getTodoCategory().getCategoryId())
                     .build();
             return ResponseDto.success(todoListCateResDto);
         }
