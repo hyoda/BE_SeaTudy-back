@@ -77,20 +77,24 @@ public class TodoCategoryService {
                 () -> new CustomException(CATEGORY_FORBIDDEN_UPDATE)
         );
         TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
-                () -> new NullPointerException("해당 카테고리가 없습니다.")
+                () -> new CustomException(CATEGORY_FORBIDDEN_UPDATE)
         );
 
-        todoCategory.update(todoCategoryRequestDto);
+        if(member.getEmail().equals(todoCategory.getMember().getEmail())){
+            todoCategory.update(todoCategoryRequestDto);
 
-        TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
-                .categoryId(todoCategory.getCategoryId())
-                .categoryName(todoCategory.getCategoryName())
-                .selectDate(todoCategory.getSelectDate())
-                .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
-                .build();
+            TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
+                    .categoryId(todoCategory.getCategoryId())
+                    .categoryName(todoCategory.getCategoryName())
+                    .selectDate(todoCategory.getSelectDate())
+                    .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
+                    .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
+                    .build();
 
-        return ResponseDto.success(todoCategoryResponseDto);
+            return ResponseDto.success(todoCategoryResponseDto);
+        }
+        return ResponseDto.fail("CATEGORY_FORBIDDEN_UPDATE","현재 사용자는 해당 카테고리를 수정할 수 없습니다.");
+
     }
 
     public ResponseDto<?> getTodoCategory(UserDetailsImpl userDetails, String selectDate) {
@@ -122,8 +126,10 @@ public class TodoCategoryService {
         TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
                 () -> new CustomException(CATEGORY_NOT_FOUND)
         );
-
-        todoCategoryRepository.delete(todoCategory);
-        return ResponseDto.success("삭제가 완료되었습니다.");
+        if(member.getEmail().equals(todoCategory.getMember().getEmail())){
+            todoCategoryRepository.delete(todoCategory);
+            return ResponseDto.success("삭제가 완료되었습니다.");
+        }
+        return ResponseDto.fail("CATEGORY_FORBIDDEN_DELETE", "현재 사용자는 해당 카테고리를 삭제할 수 없습니다.");
     }
 }

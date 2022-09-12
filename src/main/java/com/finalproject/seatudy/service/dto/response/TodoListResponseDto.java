@@ -34,4 +34,15 @@ public class TodoListResponseDto {
         private String selectDate;
         private int done;
     }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class TodoListCateResDto {
+        private Long todoId;
+        private String content;
+        private int done;
+        private Long categoryId;
+        private String selectDate;
+    }
 }
