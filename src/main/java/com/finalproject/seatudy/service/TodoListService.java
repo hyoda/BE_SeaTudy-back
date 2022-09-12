@@ -80,6 +80,7 @@ public class TodoListService {
                     .content(todoList.getContent())
                     .selectDate(todoList.getSelectDate())
                     .done(todoList.getDone())
+                    .categoryId(todoList.getTodoCategory().getCategoryId())
                     .build();
             return ResponseDto.success(todoListCateResDto);
         }
@@ -121,6 +122,7 @@ public class TodoListService {
                         .content(todoListDone.getContent())
                         .selectDate(todoListDone.getSelectDate())
                         .done(todoListDone.getDone())
+                        .categoryId(todoListDone.getTodoCategory().getCategoryId())
                         .build();
                 return ResponseDto.success(todoListCateResDto);
             }
@@ -130,6 +132,7 @@ public class TodoListService {
                     .content(todoListDone.getContent())
                     .selectDate(todoListDone.getSelectDate())
                     .done(todoListDone.getDone())
+                    .categoryId(todoListDone.getTodoCategory().getCategoryId())
                     .build();
             return ResponseDto.success(todoListCateResDto);
         }
