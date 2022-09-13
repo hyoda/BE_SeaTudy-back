@@ -36,6 +36,17 @@ public class TodoCategoryService {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+        List<TodoCategory> categories = todoCategoryRepository.findAllByCategoryName(todoCategoryRequestDto.getCategoryName());
+        if(todoCategoryRequestDto.getCategoryName().isEmpty()) {
+            throw new CustomException(EMPTY_CATEGORY);
+        }
+        if(categories.size()>0) {
+            for (TodoCategory category : categories) {
+                if(category.getCategoryName().equals(todoCategoryRequestDto.getCategoryName())){
+                    throw new CustomException(DUPLICATE_CATEGORY);
+                }
+            }
+        }
         TodoCategory todoCategory = TodoCategory.builder()
                 .member(member)
                 .categoryName(todoCategoryRequestDto.getCategoryName())
@@ -80,6 +91,15 @@ public class TodoCategoryService {
         TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
                 () -> new CustomException(CATEGORY_FORBIDDEN_UPDATE)
         );
+        if(!todoCategory.getSelectDate().equals(todoCategoryRequestDto.getSelectDate())){
+            throw new CustomException(SELECTDATE_NOT_SAME);
+        }
+        if(!todoCategoryRequestDto.getCategoryName().equals(todoCategory.getCategoryName())){
+            throw new CustomException(DUPLICATE_CATEGORY);
+        }
+        if (!todoCategoryRequestDto.getCategoryName().isEmpty()) {
+            throw new CustomException(EMPTY_CATEGORY);
+        }
 
         if(member.getEmail().equals(todoCategory.getMember().getEmail())){
             todoCategory.update(todoCategoryRequestDto);
