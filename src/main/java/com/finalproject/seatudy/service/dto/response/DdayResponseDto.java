@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.service.dto.response;
 
+import com.finalproject.seatudy.domain.entity.Dday;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class DdayResponseDto {
     private String TargetDay;
     private Long Dday;
 
-    public static DdayResponseDto fromEntity(com.finalproject.seatudy.domain.entity.Dday dday){
+    public static DdayResponseDto fromEntity(Dday dday){
 
         return new DdayResponseDto(
                 dday.getDdayId(),
@@ -24,4 +25,10 @@ public class DdayResponseDto {
                 dday.getDday()
         );
     }
+//    public DdayResponseDto(Dday dday) {
+//        this.DdayId = dday.getDdayId();
+//        this.title = dday.getTitle();
+//        this.TargetDay = dday.getTargetDay();
+//        this.Dday = dday.getDday();
+//    }
 }

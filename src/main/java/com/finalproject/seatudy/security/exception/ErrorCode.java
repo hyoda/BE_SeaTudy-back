@@ -30,13 +30,17 @@ public enum ErrorCode {
     CATEGORY_FORBIDDEN_GET(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 조회할 수 없습니다."),
     CATEGORY_FORBIDDEN_POST(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 만들 수 없습니다."),
     CATEGORY_FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 수정할 수 없습니다."),
-    CATEGORY_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 삭제할 수 없습니다.");
+    CATEGORY_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 삭제할 수 없습니다."),
 
     // D-day Error
-
+    TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST,"타이틀을 입력해야 합니다." ),
+    DDAY_NOT_FOUND(HttpStatus.BAD_REQUEST, "디데이가 존재하지 않습니다." ),
+    DDAY_FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 디데이를 수정할 수 없습니다."),
+    DDAY_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 디데이를 삭제할 수 없습니다."),
 
     // Time_check Error
-
+    CHECKOUT_NOT_TRY(HttpStatus.BAD_REQUEST, "연속으로 체크인을 할 수 없습니다."),
+    CHECKIN_NOT_TRY(HttpStatus.BAD_REQUEST,"연속으로 체크아웃을 할 수 없습니다.");
     // Chat Error
 
     private final HttpStatus httpStatus;

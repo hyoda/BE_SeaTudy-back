@@ -1,13 +1,14 @@
 package com.finalproject.seatudy.service;
 
-import com.finalproject.seatudy.domain.entity.Rank;
-import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.domain.entity.Member;
-import com.finalproject.seatudy.domain.repository.MemberRepository;
-import com.finalproject.seatudy.security.UserDetailsImpl;
-import com.finalproject.seatudy.service.dto.response.TimeCheckListDto;
+import com.finalproject.seatudy.domain.entity.Rank;
 import com.finalproject.seatudy.domain.entity.TimeCheck;
+import com.finalproject.seatudy.domain.repository.MemberRepository;
+import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.domain.repository.TimeCheckRepository;
+import com.finalproject.seatudy.security.UserDetailsImpl;
+import com.finalproject.seatudy.security.exception.CustomException;
+import com.finalproject.seatudy.service.dto.response.TimeCheckListDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,11 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKIN_NOT_TRY;
+import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKOUT_NOT_TRY;
 import static com.finalproject.seatudy.service.util.CalendarUtil.*;
-import static com.finalproject.seatudy.service.util.Formatter.*;
+import static com.finalproject.seatudy.service.util.Formatter.sdtf;
+import static com.finalproject.seatudy.service.util.Formatter.stf;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,9 +40,7 @@ public class TimeCheckService {
     @Transactional
     public TimeCheckListDto.CheckIn checkIn(UserDetailsImpl userDetails) throws ParseException {
 
-        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new RuntimeException("NON_EXISTENT_USER")
-        );
+        Member member = userDetails.getMember();
 
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
 
@@ -61,7 +63,7 @@ public class TimeCheckService {
         //체크아웃을 하지 않은 상태에서 체크인을 시도할 경우 NPE
         for (TimeCheck timeCheck : timeChecks) {
             if (timeCheck.getCheckOut() == null) {
-                throw new RuntimeException("TRY_CHECKOUT");
+                throw new CustomException(CHECKOUT_NOT_TRY);
             }
         }
 
@@ -102,9 +104,7 @@ public class TimeCheckService {
 
     public TimeCheckListDto.TimeCheckDto getCheckIn(UserDetailsImpl userDetails) throws ParseException {
 
-        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new RuntimeException("NON_EXISTENT_USER")
-        );
+        Member member = userDetails.getMember();
 
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
 
@@ -201,9 +201,7 @@ public class TimeCheckService {
     @Transactional
     public TimeCheckListDto.CheckOut checkOut(UserDetailsImpl userDetails) throws ParseException {
 
-        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new RuntimeException("NON_EXISTENT_USER")
-        );
+        Member member = userDetails.getMember();
 
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
 
@@ -230,7 +228,7 @@ public class TimeCheckService {
         String dayStudy = getCheckIn(userDetails).getDayStudyTime(); //총 공부시간
 
         if (lastCheckIn.getCheckOut() != null){
-            throw new RuntimeException("TRY_START"); // 400 _ TRY_ONE_CKECKIN
+            throw new CustomException(CHECKIN_NOT_TRY);
         }
 
         if (findRank.isPresent()){
