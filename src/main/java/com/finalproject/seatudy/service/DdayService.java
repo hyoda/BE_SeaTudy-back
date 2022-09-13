@@ -1,11 +1,12 @@
 package com.finalproject.seatudy.service;
 
+import com.finalproject.seatudy.domain.entity.Dday;
+import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.repository.DdayRepository;
+import com.finalproject.seatudy.security.UserDetailsImpl;
+import com.finalproject.seatudy.security.exception.CustomException;
 import com.finalproject.seatudy.service.dto.request.DdayRequestDto;
 import com.finalproject.seatudy.service.dto.response.DdayResponseDto;
-import com.finalproject.seatudy.domain.entity.Dday;
-import com.finalproject.seatudy.domain.repository.DdayRepository;
-import com.finalproject.seatudy.domain.entity.Member;
-import com.finalproject.seatudy.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.finalproject.seatudy.security.exception.ErrorCode.*;
 import static com.finalproject.seatudy.service.util.Formatter.sdf;
 
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class DdayService {
         Long ddayResult = ddayCalculate(requestDto);
 
         if (requestDto.getTitle().isEmpty()) {
-            throw new RuntimeException("타이틀을 입력해야 합니다.");
+            throw new CustomException(TITLE_NOT_EMPTY);
         }
 
         Dday dday = Dday.builder()
@@ -67,11 +69,11 @@ public class DdayService {
         Member member = userDetails.getMember();
 
         Dday dday = ddayRepository.findById(ddayId).orElseThrow(
-                () -> new RuntimeException("해당 D-day가 존재하지 않습니다.")
+                () -> new CustomException(DDAY_NOT_FOUND)
         );
 
         if (!member.getEmail().equals(dday.getMember().getEmail())){
-            throw new RuntimeException("작성자만 수정할 수 있습니다.");
+            throw new CustomException(DDAY_FORBIDDEN_UPDATE);
         }
 
         Long ddayResult = ddayCalculate(requestDto);
@@ -92,11 +94,11 @@ public class DdayService {
         Member member = userDetails.getMember();
 
         Dday dday = ddayRepository.findById(ddayId).orElseThrow(
-                () -> new RuntimeException("해당 D-day가 존재하지 않습니다.")
+                () -> new CustomException(DDAY_NOT_FOUND)
         );
 
         if (!member.getEmail().equals(dday.getMember().getEmail())){
-            throw new RuntimeException("작성자만 수정할 수 있습니다.");
+            throw new CustomException(DDAY_FORBIDDEN_DELETE);
         }
 
         ddayRepository.deleteById(ddayId);
