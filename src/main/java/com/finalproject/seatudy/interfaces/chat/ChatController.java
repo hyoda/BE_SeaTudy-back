@@ -32,6 +32,7 @@ public class ChatController {
         Member member = getMemberNickname(token);
 
         chatRoomService.enterChatRoom(message.getRoomId());
+        log.info("{}, {} 채팅방 입장", message.getRoomId(), member.getEmail());
         message.setMessage(member.getNickname() + "님이 채팅방에 참여하였습니다.");
         redisPublisher.publish(chatRoomService.getTopic(message.getRoomId()), message);
     }

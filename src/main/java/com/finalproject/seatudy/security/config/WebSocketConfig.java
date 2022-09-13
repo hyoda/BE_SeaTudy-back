@@ -21,8 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // SockJS Client or WebSocket이 HandShake Connection을 생성할 경로
         registry.addEndpoint("/api/v1/chat/connections")
-                .setAllowedOrigins("http://localhost:8080", "http://localhost:3000",
-                        "http://43.200.115.252")
+                .setAllowedOrigins("http://localhost:8080", "http://localhost:3000")
                 .withSockJS();
     }
 
