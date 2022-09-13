@@ -1,5 +1,6 @@
-package com.finalproject.seatudy.security;
+package com.finalproject.seatudy.security.config;
 
+import com.finalproject.seatudy.security.FilterSkipMatcher;
 import com.finalproject.seatudy.security.exception.AuthenticationFailHandler;
 import com.finalproject.seatudy.security.filter.JwtAuthFilter;
 import com.finalproject.seatudy.security.jwt.HeaderTokenExtractor;
@@ -53,7 +54,8 @@ public class WebSecurityConfig {
                         "/v2/api-docs",
                         "/webjars/**",
                         "/swagger-resources/**",
-                        "/swagger/**", "/h2-console/**", "/swagger-ui.html");
+                        "/swagger/**", "/h2-console/**", "/swagger-ui.html",
+                        "/api/v1/chat/connections/**");
     }
 
     @Bean
