@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.domain.entity;
 
+import com.finalproject.seatudy.service.dto.request.TodoListRequestDto;
 import com.finalproject.seatudy.service.dto.request.TodoListUpdateDto;
 import lombok.*;
 import javax.persistence.*;

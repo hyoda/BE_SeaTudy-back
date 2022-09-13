@@ -35,14 +35,25 @@ public class TodoListService {
 
     //todo 리스트 생성
     public ResponseDto<?> createTodoList(UserDetailsImpl userDetails,Long todoCategoryId,TodoListRequestDto todoListRequestDto){
+        if(todoListRequestDto.getContent().isEmpty()){
+            throw new CustomException(EMPTY_TODOLIST);
+        }
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         TodoCategory todoCategory = getTodoCategory(todoCategoryId);
 
-        // todo 리스트 selectDate랑 todoCategory selectDate랑 같아야함(조건문 생성) -> 아니면 오류
         if(!todoListRequestDto.getSelectDate().equals(todoCategory.getSelectDate())){
             throw new CustomException(MISMATCH_SELECT_DATE);
+        }
+
+        List<TodoList> todoLists = todolistRepository.findAllBySelectDateAndTodoCategory_CategoryName(todoCategory.getSelectDate(), todoCategory.getCategoryName());
+        if(todoLists.size()>0){
+            for (TodoList todoList : todoLists) {
+                if(todoList.getContent().equals(todoListRequestDto.getContent())){
+                    throw new CustomException(DUPLICATE_TODOLIST);
+                }
+            }
         }
         if(todoCategory.getMember().getEmail().equals(member.getEmail())){
             TodoList todoList = TodoList.builder()
