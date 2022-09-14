@@ -33,7 +33,6 @@ import static com.finalproject.seatudy.service.util.Formatter.stf;
 public class TimeCheckService {
 
     private final TimeCheckRepository timeCheckRepository;
-    private final MemberRepository memberRepository;
     private final RankRepository rankRepository;
 
 
@@ -180,6 +179,7 @@ public class TimeCheckService {
             TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
                     .dayStudyTime(todayStudy)
                     .totalStudyTime(total)
+                    .isStudy(false)
                     .todayLogs(todayLogDtos)
                     .build();
 
@@ -191,6 +191,7 @@ public class TimeCheckService {
         TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
                 .dayStudyTime(dayStudyTime)
                 .totalStudyTime(total)
+                .isStudy(true)
                 .todayLogs(todayLogDtos)
                 .build();
 
