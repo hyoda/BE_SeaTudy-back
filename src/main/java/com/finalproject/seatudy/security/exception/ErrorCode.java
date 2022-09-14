@@ -37,8 +37,9 @@ public enum ErrorCode {
 
     // Time_check Error
     CHECKOUT_NOT_TRY(HttpStatus.BAD_REQUEST, "연속으로 체크인을 할 수 없습니다."),
-    CHECKIN_NOT_TRY(HttpStatus.BAD_REQUEST,"연속으로 체크아웃을 할 수 없습니다.");
+    CHECKIN_NOT_TRY(HttpStatus.BAD_REQUEST,"연속으로 체크아웃을 할 수 없습니다."),
     // Chat Error
+    EMPTY_MESSAGE(HttpStatus.BAD_REQUEST, "메시지를 입력해주세요");
 
     private final HttpStatus httpStatus;
     private final String message;

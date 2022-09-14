@@ -32,8 +32,8 @@ public class ChatController {
         Member member = getMemberNickname(token);
 
         chatRoomService.enterChatRoom(message.getRoomId());
-        log.info("{}, {} 채팅방 입장", message.getRoomId(), member.getEmail());
-        message.setMessage(member.getNickname() + "님이 채팅방에 참여하였습니다.");
+        log.info("room_id: {}, {} 채팅방 입장", message.getRoomId(), member.getEmail());
+        message.setMessage("'" + member.getNickname() + "'" + "님이 입실하였습니다.");
         redisPublisher.publish(chatRoomService.getTopic(message.getRoomId()), message);
     }
 
@@ -41,9 +41,12 @@ public class ChatController {
     public void message(ChatMessageDto message, @Header("Authorization") String token) {
         Member member = getMemberNickname(token);
 
-        message.setSender(member.getNickname());
-        log.info("사용자가 채팅방에 메시지전송 ----- {}:{}",message.getSender(), message.getMessage());
-        redisPublisher.publish(chatRoomService.getTopic(message.getRoomId()), message);
+        if(!message.getMessage().isEmpty() || message.getMessage() != null || !message.getMessage().equals("")) {
+            message.setSender(member.getNickname());
+            log.info("사용자가 채팅방에 메시지전송 -- {}:{}",message.getSender(), message.getMessage());
+            redisPublisher.publish(chatRoomService.getTopic(message.getRoomId()), message);
+        }
+        throw new CustomException(ErrorCode.EMPTY_MESSAGE);
     }
 
     private Member getMemberNickname(String token) {
