@@ -31,6 +31,7 @@ public class TimeCheckListDto {
     public static class TimeCheckDto {
         private String dayStudyTime;
         private String totalStudyTime;
+        private Boolean isStudy;
         private List<TodayLogDto> todayLogs;
     }
     @Builder
