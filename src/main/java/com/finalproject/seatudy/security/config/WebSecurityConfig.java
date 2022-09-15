@@ -6,6 +6,7 @@ import com.finalproject.seatudy.security.filter.JwtAuthFilter;
 import com.finalproject.seatudy.security.jwt.HeaderTokenExtractor;
 import com.finalproject.seatudy.security.provider.JWTAuthProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -37,6 +38,9 @@ public class WebSecurityConfig {
     private final HeaderTokenExtractor headerTokenExtractor;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final AuthenticationFailHandler authenticationFailHandler;
+
+    @Value("${https://seatudy.vercel.app}")
+    private final String FRONT_BASE_URL;
 
 
     @Bean
@@ -140,7 +144,7 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin(FRONT_BASE_URL);
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
