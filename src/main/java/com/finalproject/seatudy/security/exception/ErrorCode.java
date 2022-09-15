@@ -15,6 +15,10 @@ public enum ErrorCode {
     // Login & Register Error
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
+    DUPLICATE_REGISTER(HttpStatus.CONFLICT, "이미 다른 소셜로그인으로 가입한 회원입니다."),
+    CURRENT_NICKNAME(HttpStatus.CONFLICT, "현재와 같은 닉네임입니다."),
+    EMPTY_NICKNAME(HttpStatus.BAD_REQUEST, "닉네임을 입력해주세요.(최소 1자이상)"),
+
 
     // TodoList Error
     TODOLIST_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 TODO리스트가 존재하지 않습니다."),

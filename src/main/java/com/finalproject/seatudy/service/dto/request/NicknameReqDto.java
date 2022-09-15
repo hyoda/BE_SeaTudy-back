@@ -1,16 +1,14 @@
-package com.finalproject.seatudy.service.dto.response;
+package com.finalproject.seatudy.service.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-public class GoogleUserDto {
-    private Long id;
-    private String email;
+public class NicknameReqDto {
     private String nickname;
 }

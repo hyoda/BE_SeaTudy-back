@@ -1,6 +1,7 @@
 package com.finalproject.seatudy.domain.entity;
 
 import com.finalproject.seatudy.domain.LoginType;
+import com.finalproject.seatudy.service.dto.request.NicknameReqDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,14 +34,8 @@ public class Member extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
-    @Nullable
-    private String birthday;
 
-
-
-
-    public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
-        return passwordEncoder.matches(password, this.password);
+    public void update(NicknameReqDto nicknameReqDto) {
+        this.nickname = nicknameReqDto.getNickname();
     }
-
 }
