@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompHandler stompHandler;
 
     @Value("${front.base.url}")
-    private final String FRONT_BASE_URL;
+    private String FRONT_BASE_URL;
 
 
     @Override
