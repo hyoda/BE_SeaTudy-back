@@ -39,9 +39,9 @@ public class WebSecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final AuthenticationFailHandler authenticationFailHandler;
 
+
     @Value("${front.base.url}")
     private String FRONT_BASE_URL;
-
 
     @Bean
     public BCryptPasswordEncoder encodePassword() {
