@@ -84,25 +84,22 @@ public class TodoCategoryService {
         return ResponseDto.success(todoCategoryResponseDtos);
     }
 
-    public ResponseDto<?> updateTodoCategory(UserDetailsImpl userDetails, Long todoCategoryId, TodoCategoryRequestDto todoCategoryRequestDto) {
+    public ResponseDto<?> updateTodoCategory(UserDetailsImpl userDetails, Long todoCategoryId, TodoCategoryRequestDto todoCategoryUpdateDto) {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
                 () -> new CustomException(CATEGORY_FORBIDDEN_UPDATE)
         );
-        if(!todoCategory.getSelectDate().equals(todoCategoryRequestDto.getSelectDate())){
-            throw new CustomException(SELECTDATE_NOT_SAME);
-        }
-        if(!todoCategoryRequestDto.getCategoryName().equals(todoCategory.getCategoryName())){
+        if(todoCategoryUpdateDto.getCategoryName().equals(todoCategory.getCategoryName())){
             throw new CustomException(DUPLICATE_CATEGORY);
         }
-        if (!todoCategoryRequestDto.getCategoryName().isEmpty()) {
+        if (todoCategoryUpdateDto.getCategoryName().isEmpty()) {
             throw new CustomException(EMPTY_CATEGORY);
         }
 
         if(member.getEmail().equals(todoCategory.getMember().getEmail())){
-            todoCategory.update(todoCategoryRequestDto);
+            todoCategory.update(todoCategoryUpdateDto);
 
             TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
                     .categoryId(todoCategory.getCategoryId())

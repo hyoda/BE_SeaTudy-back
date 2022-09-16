@@ -35,7 +35,6 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 카테고리가 존재하지 않습니다."),
     CATEGORY_FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 수정할 수 없습니다."),
     CATEGORY_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 삭제할 수 없습니다."),
-    SELECTDATE_NOT_SAME(HttpStatus.CONFLICT, "수정할 카테고리의 날짜는 다른날짜 입니다."),
     DUPLICATE_CATEGORY(HttpStatus.CONFLICT, "동일한 카테고리가 존재합니다."),
     EMPTY_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리 이름을 입력해주세요(최소 1자이상)"),
 

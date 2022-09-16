@@ -46,8 +46,8 @@ public class TodoCategoryController {
     @ApiImplicitParam(name = "todoCategoryId", value = "할일 카테고리 아이디")
     public ResponseDto<?> updateTodoCategory(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                              @PathVariable Long todoCategoryId,
-                                             @RequestBody TodoCategoryRequestDto todoCategoryRequestDto) {
-        return todoCategoryService.updateTodoCategory(userDetails,todoCategoryId,todoCategoryRequestDto);
+                                             @RequestBody TodoCategoryRequestDto todoCategoryUpdateDto) {
+        return todoCategoryService.updateTodoCategory(userDetails,todoCategoryId,todoCategoryUpdateDto);
     }
 
     @DeleteMapping("/todoCategories/{todoCategoryId}")
