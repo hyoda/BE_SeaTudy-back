@@ -35,9 +35,9 @@ jobs:
 
     - name: make application.properties
       run: |
-        cd ./src/main
-        touch ./resources/application.properties
-        echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./application.properties
+        cd ./src/main/resources
+        touch ./seatudy_application.properties
+        echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./seatudy_application.properties
       shell: bash
 
 
