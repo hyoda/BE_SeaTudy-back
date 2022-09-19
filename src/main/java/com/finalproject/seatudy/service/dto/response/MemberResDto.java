@@ -15,4 +15,5 @@ public class MemberResDto {
     private String email;
     private String nickname;
     private LoginType loginType;
+    private Long point;
 }

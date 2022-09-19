@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class NicknameReqDto {
     private String nickname;
+    private String birth;
+    private Long point;
 }

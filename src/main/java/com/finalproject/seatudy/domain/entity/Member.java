@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 
@@ -34,6 +33,11 @@ public class Member extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
 
+    @Nullable
+    private String birthday;
+
+    @Column
+    private Long point;
 
     public void update(NicknameReqDto nicknameReqDto) {
         this.nickname = nicknameReqDto.getNickname();

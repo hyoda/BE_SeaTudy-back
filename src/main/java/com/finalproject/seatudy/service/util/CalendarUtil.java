@@ -65,6 +65,23 @@ public class CalendarUtil {
 //        return totalSumTime;
     }
 
+    public static Long totalPoint(List<Rank> allUserList) {
+        long total = 0L; //총 누적 공부시간이 담김
+
+        for (Rank find : allUserList) {
+            String[] arrayFind = find.getDayStudy().split(":");
+            int allHH = Integer.parseInt(arrayFind[0]);
+            int allMM = Integer.parseInt(arrayFind[1]);
+            int allSS = allHH * 3600 + allMM * 60;
+            int alltotal = allSS + Integer.parseInt(arrayFind[2]); //초으로 환산
+            total += alltotal;
+        }
+            Long totalHH = (total / 3600);
+
+            return totalHH;
+    }
+
+
     // String yyyy-MM-dd HH:mm:ss 형식으로 return; 현재 시간
     private static String nowDateTime() {
         ZonedDateTime nowSeoul = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
@@ -80,10 +97,4 @@ public class CalendarUtil {
         String setToday = setDate + "05:00:00"; //어제 날짜 + 오전5시 -> 조건을 걸기 위해 만들어줌?
         return sdtf.parse(setToday);
     }
-
-
-//    public static void main(String[] args) throws ParseException {
-//        todayCalendarTime(Calendar.getInstance());
-//        setCalendarTime(Calendar.getInstance());
-//    }
 }

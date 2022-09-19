@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.domain.LoginType;
 import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.entity.Rank;
+import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
 import com.finalproject.seatudy.service.MemberService;
 import com.finalproject.seatudy.service.dto.response.MemberResDto;
@@ -22,6 +24,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
 
 @Slf4j
 @Service
@@ -29,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 public class NaverMemberService {
     private final MemberService memberService;
     private final JwtTokenUtils jwtTokenUtils;
+    private final RankRepository rankRepository;
 
     @Value("${security.oauth2.naver.grant_type}")
     private String NAVER_GRANT_TYPE;
@@ -36,7 +42,6 @@ public class NaverMemberService {
     private String NAVER_CLIENT_ID;
     @Value("${security.oauth2.naver.client_secret}")
     private String NAVER_CLIENT_SECRET;
-
 
     public ResponseDto<?> naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         String naverACTokens = getNaverTokens(code, state);
@@ -49,12 +54,18 @@ public class NaverMemberService {
         memberService.tokenToHeaders(naverAC, response);
 
         log.info("Naver 로그인 완료: {}", member.getEmail());
+        List<Rank> allMemberList = rankRepository.findByMember(member);
+
+        Long point = totalPoint(allMemberList);
+
+        log.info("네이버 로그인 완료: {}", member.getEmail());
         return ResponseDto.success(
                 MemberResDto.builder()
                         .id(member.getMemberId())
                         .email(member.getEmail())
                         .nickname(member.getNickname())
                         .loginType(LoginType.NAVER)
+                        .point(point)
                         .build()
         );
     }

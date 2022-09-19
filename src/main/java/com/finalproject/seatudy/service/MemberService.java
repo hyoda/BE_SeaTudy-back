@@ -46,6 +46,7 @@ public class MemberService {
                         .email(findMember.getEmail())
                         .nickname(findMember.getNickname())
                         .loginType(findMember.getLoginType())
+                        .point(findMember.getPoint())
                         .build()
         );
     }
@@ -87,6 +88,7 @@ public class MemberService {
                     .nickname(name)
                     .password(passwordEncoder.encode(password))
                     .loginType(loginType)
+                    .point(0L)
                     .build();
 
             memberRepository.save(member);

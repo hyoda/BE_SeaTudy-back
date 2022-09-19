@@ -22,6 +22,9 @@ public class Rank {
     private String dayStudy;
 
     @Column
+    private String totalStudy;
+
+    @Column
     private String date;
 
     @ManyToOne

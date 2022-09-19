@@ -2,15 +2,13 @@ package com.finalproject.seatudy.interfaces;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.finalproject.seatudy.security.UserDetailsImpl;
-import com.finalproject.seatudy.service.MemberService;
-import com.finalproject.seatudy.service.dto.request.LoginRequestDto;
-import com.finalproject.seatudy.service.dto.request.MemberRequestDto;
-import com.finalproject.seatudy.service.dto.request.NicknameReqDto;
-import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import com.finalproject.seatudy.infra.GoogleMemberService;
 import com.finalproject.seatudy.infra.KaKaoMemberService;
 import com.finalproject.seatudy.infra.NaverMemberService;
+import com.finalproject.seatudy.security.UserDetailsImpl;
+import com.finalproject.seatudy.service.MemberService;
+import com.finalproject.seatudy.service.dto.request.NicknameReqDto;
+import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -18,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController

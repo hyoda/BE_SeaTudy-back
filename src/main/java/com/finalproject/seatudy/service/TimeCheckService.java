@@ -9,6 +9,7 @@ import com.finalproject.seatudy.domain.repository.TimeCheckRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
 import com.finalproject.seatudy.service.dto.response.TimeCheckListDto;
+import com.finalproject.seatudy.service.dto.response.TimeCheckListDto.TimeCheckDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.*;
 
 import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKIN_NOT_TRY;
 import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKOUT_NOT_TRY;
+import static com.finalproject.seatudy.service.dto.response.TimeCheckListDto.*;
 import static com.finalproject.seatudy.service.util.CalendarUtil.*;
 import static com.finalproject.seatudy.service.util.Formatter.sdtf;
 import static com.finalproject.seatudy.service.util.Formatter.stf;
@@ -37,7 +39,7 @@ public class TimeCheckService {
 
 
     @Transactional
-    public TimeCheckListDto.CheckIn checkIn(UserDetailsImpl userDetails) throws ParseException {
+    public CheckIn checkIn(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
 
@@ -89,7 +91,7 @@ public class TimeCheckService {
         int ss = Integer.parseInt(timeStamp[2]); //초
 
 
-        TimeCheckListDto.CheckIn checkIn = TimeCheckListDto.CheckIn.builder()
+        CheckIn checkIn = CheckIn.builder()
                 .checkIn(nowTime)
                 .timeWatch(timeWatch)
                 .HH(HH)
@@ -101,7 +103,7 @@ public class TimeCheckService {
 //        return timeWatch;
     }
 
-    public TimeCheckListDto.TimeCheckDto getCheckIn(UserDetailsImpl userDetails) throws ParseException {
+    public TimeCheckDto getCheckIn(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
 
@@ -124,7 +126,7 @@ public class TimeCheckService {
 
         List<TimeCheck> findCheckIn = timeCheckRepository.findByMemberAndDate(member, setToday);
 
-        List<TimeCheckListDto.TodayLogDto> todayLogDtos = new ArrayList<>(); // 그 날의 로그 기록
+        List<TodayLogDto> todayLogDtos = new ArrayList<>(); // 그 날의 로그 기록
 
         // 기록이 없을 경우
         if (findCheckIn.size() == 0){
@@ -132,9 +134,10 @@ public class TimeCheckService {
 
             String total = totalTime(allMemberList);
 
-            TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
+            TimeCheckDto timeCheckDto = TimeCheckDto.builder()
                     .dayStudyTime("00:00:00")
                     .totalStudyTime(total)
+                    .isStudy(false)
                     .todayLogs(todayLogDtos)
                     .build();
 
@@ -166,7 +169,7 @@ public class TimeCheckService {
         String total = totalTime(allMemberList);
 
         for (TimeCheck check : findCheckIn){
-            TimeCheckListDto.TodayLogDto todayLogDto = TimeCheckListDto.TodayLogDto.builder()
+            TodayLogDto todayLogDto = TodayLogDto.builder()
                     .checkIn(check.getCheckIn())
                     .checkOut(check.getCheckOut())
                     .build();
@@ -176,7 +179,7 @@ public class TimeCheckService {
         //체크인, 체크아웃 기록된 세트가 1회 이상 있는 경우
         if (findCheckIn.get(findCheckIn.size() - 1).getCheckOut() != null){
             String todayStudy = rank.get().getDayStudy();
-            TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
+            TimeCheckDto timeCheckDto = TimeCheckDto.builder()
                     .dayStudyTime(todayStudy)
                     .totalStudyTime(total)
                     .isStudy(false)
@@ -188,7 +191,7 @@ public class TimeCheckService {
         }
 
         // 현재시간 + 누적시간
-        TimeCheckListDto.TimeCheckDto timeCheckDto = TimeCheckListDto.TimeCheckDto.builder()
+        TimeCheckDto timeCheckDto = TimeCheckDto.builder()
                 .dayStudyTime(dayStudyTime)
                 .totalStudyTime(total)
                 .isStudy(true)
@@ -200,7 +203,7 @@ public class TimeCheckService {
     }
 
     @Transactional
-    public TimeCheckListDto.CheckOut checkOut(UserDetailsImpl userDetails) throws ParseException {
+    public CheckOut checkOut(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
 
@@ -228,6 +231,10 @@ public class TimeCheckService {
 
         String dayStudy = getCheckIn(userDetails).getDayStudyTime(); //총 공부시간
 
+        List<Rank> allMemberList = rankRepository.findByMember(member);
+
+        String total = totalTime(allMemberList);
+
         if (lastCheckIn.getCheckOut() != null){
             throw new CustomException(CHECKIN_NOT_TRY);
         }
@@ -236,6 +243,7 @@ public class TimeCheckService {
             lastCheckIn.setCheckOut(nowTime);
             lastCheckIn.setRank(findCheckIns.get(0).getRank());
             findRank.get().setDayStudy(dayStudy);
+            findRank.get().setTotalStudy(total);
 
             log.info("체크아웃 {}", getCheckIn(userDetails));
 
@@ -245,7 +253,7 @@ public class TimeCheckService {
             int mm = Integer.parseInt(timeStamp[1]); //분
             int ss = Integer.parseInt(timeStamp[2]); //초
 
-            TimeCheckListDto.CheckOut checkOut = TimeCheckListDto.CheckOut.builder()
+            CheckOut checkOut = CheckOut.builder()
                     .checkOut(nowTime)
                     .timeWatch(dayStudy)
                     .HH(HH)
@@ -259,6 +267,7 @@ public class TimeCheckService {
         lastCheckIn.setCheckOut(nowTime);
         Rank rank = Rank.builder()
                 .dayStudy(dayStudy)
+                .totalStudy(total)
                 .date(setToday)
                 .member(member)
                 .timeChecks(findCheckIns)
@@ -272,7 +281,7 @@ public class TimeCheckService {
         int mm = Integer.parseInt(timeStamp[1]); //분
         int ss = Integer.parseInt(timeStamp[2]); //초
 
-        TimeCheckListDto.CheckOut checkOut = TimeCheckListDto.CheckOut.builder()
+        CheckOut checkOut = CheckOut.builder()
                 .checkOut(nowTime)
                 .timeWatch(dayStudy)
                 .HH(HH)
