@@ -4,7 +4,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.repository.MemberRepository;
+import com.finalproject.seatudy.security.exception.CustomException;
+import com.finalproject.seatudy.security.exception.ErrorCode;
 import io.jsonwebtoken.io.Decoders;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -16,10 +21,12 @@ import java.util.Optional;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class JwtDecoder {
 
     @Value("${jwt.secret}")
     private String JWT_SECRET;
+    private final MemberRepository memberRepository;
 
     public String decodeUsername(String token){
         DecodedJWT decodedJWT = isValidToken(token).orElseThrow(
@@ -34,6 +41,14 @@ public class JwtDecoder {
         return decodedJWT.getSubject();
     }
 
+    public Member getMemberNickname(String token) {
+        String accessToken = token.substring(7);
+        String email = decodeUsername(accessToken);
+
+        return memberRepository.findByEmail(email).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+    }
 
     public Optional<DecodedJWT> isValidToken(String token){
 
@@ -51,14 +66,4 @@ public class JwtDecoder {
 
         return Optional.ofNullable(jwt);
     }
-//    public boolean isValidRefreshToken(String refreshToken){
-//        DecodedJWT decodedJWT = isValidToken(refreshToken).orElseThrow(()->new IllegalArgumentException("유효한 토큰이 아닙니다."));
-//        Date expiredDate = decodedJWT.getClaim(CLAIM_EXPIRED_DATE).asDate();
-//
-//        Date now = new Date();
-//        if(expiredDate.before(now)){
-//            throw new IllegalArgumentException("유효시간이 지난 토큰 입니다");
-//        }
-//        return true;
-//    }
 }
