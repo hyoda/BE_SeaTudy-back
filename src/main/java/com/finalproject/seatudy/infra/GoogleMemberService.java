@@ -54,7 +54,7 @@ public class GoogleMemberService {
         String googleAC = jwtTokenUtils.generateJwtToken(googleMember);
         memberService.tokenToHeaders(googleAC, response);
 
-        List<Rank> allMemberList = rankRepository.findByMember(googleMember);
+        List<Rank> allMemberList = rankRepository.findAllByMember(googleMember);
 
         Long point = totalPoint(allMemberList);
 

@@ -3,20 +3,23 @@ package com.finalproject.seatudy.service;
 import com.finalproject.seatudy.domain.entity.Member;
 import com.finalproject.seatudy.domain.entity.Rank;
 import com.finalproject.seatudy.domain.entity.TimeCheck;
+import com.finalproject.seatudy.domain.entity.WeekRank;
 import com.finalproject.seatudy.domain.repository.MemberRepository;
 import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.domain.repository.TimeCheckRepository;
+import com.finalproject.seatudy.domain.repository.WeekRankRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
-import com.finalproject.seatudy.service.dto.response.TimeCheckListDto;
-import com.finalproject.seatudy.service.dto.response.TimeCheckListDto.TimeCheckDto;
+import com.finalproject.seatudy.service.dto.response.TimeCheckListDto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +31,7 @@ import static com.finalproject.seatudy.service.dto.response.TimeCheckListDto.*;
 import static com.finalproject.seatudy.service.util.CalendarUtil.*;
 import static com.finalproject.seatudy.service.util.Formatter.sdtf;
 import static com.finalproject.seatudy.service.util.Formatter.stf;
+import static java.lang.String.format;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,6 +40,8 @@ public class TimeCheckService {
 
     private final TimeCheckRepository timeCheckRepository;
     private final RankRepository rankRepository;
+    private final MemberRepository memberRepository;
+    private final WeekRankRepository weekRankRepository;
 
 
     @Transactional
@@ -130,7 +136,7 @@ public class TimeCheckService {
 
         // 기록이 없을 경우
         if (findCheckIn.size() == 0){
-            List<Rank> allMemberList = rankRepository.findByMember(member);
+            List<Rank> allMemberList = rankRepository.findAllByMember(member);
 
             String total = totalTime(allMemberList);
 
@@ -164,7 +170,7 @@ public class TimeCheckService {
 
         String dayStudyTime = RankCheck(rank, today); //하루 누적 시간 계산
 
-        List<Rank> allMemberList = rankRepository.findByMember(member);
+        List<Rank> allMemberList = rankRepository.findAllByMember(member);
 
         String total = totalTime(allMemberList);
 
@@ -231,21 +237,48 @@ public class TimeCheckService {
 
         String dayStudy = getCheckIn(userDetails).getDayStudyTime(); //총 공부시간
 
-        List<Rank> allMemberList = rankRepository.findByMember(member);
+        List<Rank> allMemberList = rankRepository.findAllByMember(member);
 
         String total = totalTime(allMemberList);
+
 
         if (lastCheckIn.getCheckOut() != null){
             throw new CustomException(CHECKIN_NOT_TRY);
         }
 
-        if (findRank.isPresent()){
+        //1
+        if (rankRepository.findAllByMember(member).size() == 0) {
+            total = dayStudy;
+        }
+
+        //2
+        if (allMemberList.size() != 0 && findRank.isEmpty()) {
+            lastCheckIn.setCheckOut(nowTime);
+            lastCheckIn.setRank(findCheckIns.get(0).getRank());
+
+            LocalTime dayStudyTime = LocalTime.parse(dayStudy);
+
+            LocalTime totalStudyTime = LocalTime.parse(total);
+
+            long second = totalStudyTime.getSecond() + dayStudyTime.getSecond();
+            long minute = totalStudyTime.getMinute() + dayStudyTime.getMinute();
+            long hour = totalStudyTime.getHour() + dayStudyTime.getHour();
+
+            String totalStudyFormat = String.format("%02d:%02d:%02d",hour,minute,second);
+            total = totalStudyFormat;
+        }
+
+        //3
+        if (findRank.isPresent()) {
             lastCheckIn.setCheckOut(nowTime);
             lastCheckIn.setRank(findCheckIns.get(0).getRank());
             findRank.get().setDayStudy(dayStudy);
+            total = totalTime(allMemberList);
+            //            allMemberList.get(allMemberList.size()-1).setTotalStudy(total);
             findRank.get().setTotalStudy(total);
 
-            log.info("체크아웃 {}", getCheckIn(userDetails));
+
+            log.info("체크아웃 {}", total);
 
             String[] timeStamp = dayStudy.split(":"); //시, 분, 초 나누기
 
@@ -315,5 +348,55 @@ public class TimeCheckService {
             return dayStudy;
         }
         return stf.format(today.getTime());
+    }
+
+    @Scheduled(cron = " 0 0 5 * * 1 ")
+    public void weekStudy() throws ParseException {
+        log.info("일주일 공부시간 저장 시작");
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
+
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members){
+            List<Rank> ranks = rankRepository.findAllByMember(member);
+            if (ranks.size() == 0){
+                continue;
+            }
+            String weekStudy =  ranks.get(ranks.size()-1).getTotalStudy();
+
+            List<WeekRank> weekRanks = weekRankRepository.findAllByMember(member);
+            if (weekRanks.size() == 0) {
+                WeekRank firstWeekRank = WeekRank.builder()
+                        .weekStudy(weekStudy)
+                        .totalStudy(weekStudy)
+                        .date(date)
+                        .member(member)
+                        .build();
+                weekRankRepository.save(firstWeekRank);
+                continue;
+            }
+
+            List<Rank> allMemberList = rankRepository.findAllByMember(member);
+
+            String totalTime = totalTime(allMemberList);
+            Date totalStudyTime = stf.parse(totalTime);
+
+            WeekRank weeksStudy = weekRanks.get(weekRanks.size()-1);
+            String weekTime = weeksStudy.getTotalStudy();
+            Date weekStudyTime = stf.parse(weekTime);
+
+            long second = (totalStudyTime.getTime() - weekStudyTime.getTime()) / 1000;
+            long minute = second / 60;
+            long hour = minute / 60;
+
+            String weekStudyFormat = String.format("%02d:%02d:%02d",hour,minute,second);
+                WeekRank afterWeekRank =  WeekRank.builder()
+                        .weekStudy(weekStudyFormat)
+                        .totalStudy(totalTime)
+                        .date(date)
+                        .member(member)
+                        .build();
+                weekRankRepository.save(afterWeekRank);
+        }
+
     }
 }

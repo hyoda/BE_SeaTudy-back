@@ -54,7 +54,7 @@ public class KaKaoMemberService {
         memberService.tokenToHeaders(kakaoAC, response);
 
         log.info("kakao 로그인 완료: {}",kakaoMember.getEmail());
-        List<Rank> allMemberList = rankRepository.findByMember(kakaoMember);
+        List<Rank> allMemberList = rankRepository.findAllByMember(kakaoMember);
 
         Long point = totalPoint(allMemberList);
 

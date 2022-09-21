@@ -54,7 +54,7 @@ public class NaverMemberService {
         memberService.tokenToHeaders(naverAC, response);
 
         log.info("Naver 로그인 완료: {}", member.getEmail());
-        List<Rank> allMemberList = rankRepository.findByMember(member);
+        List<Rank> allMemberList = rankRepository.findAllByMember(member);
 
         Long point = totalPoint(allMemberList);
 

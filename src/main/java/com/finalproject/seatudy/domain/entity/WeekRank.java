@@ -3,25 +3,23 @@ package com.finalproject.seatudy.domain.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
-@Entity(name = "ranks")
+@Entity(name = "weekRanks")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class Rank {
+public class WeekRank {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long rankId;
+    private Long weekRankId;
 
-    // 일일 총 공부한 시간
+    // 일주일 공부한 시간
     @Column
-    private String dayStudy;
+    private String weekStudy;
 
-    // 총 공부한 시간
     @Column
     private String totalStudy;
 
@@ -31,8 +29,4 @@ public class Rank {
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
-
-    @OneToMany(mappedBy = "rank")
-    private List<TimeCheck> timeChecks;
-
 }
