@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface RankRepository extends JpaRepository<Rank, Long> {
     Optional<Rank> findByMemberAndDate(Member member, String date);
-    List<Rank> findByMember(Member member);
-    List<Rank> findByDate(String date);
+    List<Rank> findAllByMember(Member member);
+    Rank findByMember(Member member);
 
 }
