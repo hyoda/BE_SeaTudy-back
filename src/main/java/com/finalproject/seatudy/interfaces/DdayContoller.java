@@ -4,6 +4,7 @@ import com.finalproject.seatudy.service.dto.request.DdayRequestDto;
 import com.finalproject.seatudy.service.dto.response.DdayResponseDto;
 import com.finalproject.seatudy.service.DdayService;
 import com.finalproject.seatudy.security.UserDetailsImpl;
+import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -22,21 +23,21 @@ public class DdayContoller {
 
     @PostMapping("/ddays")
     @ApiOperation(value = "D-day 생성")
-    public DdayResponseDto createDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                      @RequestBody DdayRequestDto requestDto) throws ParseException {
+    public ResponseDto<?> createDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                     @RequestBody DdayRequestDto requestDto) throws ParseException {
         return ddayService.createDday(userDetails, requestDto);
     }
 
     @GetMapping("/ddays")
     @ApiOperation(value = "D-day 조회")
-    public List<DdayResponseDto> getDday(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseDto<?> getDday(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return ddayService.getDday(userDetails);
     }
 
     @PutMapping("/ddays/{ddayId}")
     @ApiOperation(value = "D-day 수정")
     @ApiImplicitParam(name = "ddayId", value = "D-day 아이디")
-    public DdayResponseDto updateDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseDto<?> updateDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                       @PathVariable Long ddayId,
                                       @RequestBody DdayRequestDto requestDto) throws ParseException{
         return ddayService.updateDday(userDetails, ddayId, requestDto);
@@ -45,7 +46,7 @@ public class DdayContoller {
     @DeleteMapping("/ddays/{ddayId}")
     @ApiOperation(value = "D-day 삭제")
     @ApiImplicitParam(name = "ddayId", value = "D-day 아이디")
-    public String deleteDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseDto<?> deleteDday(@AuthenticationPrincipal UserDetailsImpl userDetails,
                             @PathVariable Long ddayId){
         return ddayService.deleteDday(userDetails, ddayId);
     }
