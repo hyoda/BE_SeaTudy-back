@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class DdayResponseDto {
-    private Long DdayId;
+    private Long dDayId;
     private String title;
-    private String TargetDay;
-    private Long Dday;
+    private String targetDay;
+    private Long dDay;
 
     public static DdayResponseDto fromEntity(Dday dday){
 
@@ -25,10 +25,4 @@ public class DdayResponseDto {
                 dday.getDday()
         );
     }
-//    public DdayResponseDto(Dday dday) {
-//        this.DdayId = dday.getDdayId();
-//        this.title = dday.getTitle();
-//        this.TargetDay = dday.getTargetDay();
-//        this.Dday = dday.getDday();
-//    }
 }
