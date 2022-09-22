@@ -64,6 +64,7 @@ public class NaverMemberService {
                         .id(member.getMemberId())
                         .email(member.getEmail())
                         .nickname(member.getNickname())
+                        .defaultFish("니모")
                         .loginType(LoginType.NAVER)
                         .point(point)
                         .build()
@@ -115,13 +116,11 @@ public class NaverMemberService {
 
         long naverId = jsonNode.get("id").asLong();
         String email = jsonNode.get("email").asText();
-        String nickname = jsonNode.get("nickname").asText();
 
         log.info("Naver에서 사용자 정보획득 완료: {}", email);
         return MemberResDto.builder()
                 .id(naverId)
                 .email(email)
-                .nickname(nickname)
                 .build();
     }
 }

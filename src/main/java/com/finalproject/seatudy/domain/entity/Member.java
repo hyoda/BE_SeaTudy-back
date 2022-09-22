@@ -28,13 +28,13 @@ public class Member extends TimeStamped {
     private String nickname;
 
     @Column
+    private String defaultFish;
+
+    @Column
     private String password;
 
     @Enumerated(EnumType.STRING)
     private LoginType loginType;
-
-    @Nullable
-    private String birthday;
 
     @Column
     private Long point;

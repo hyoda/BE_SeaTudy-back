@@ -14,6 +14,7 @@ public class MemberResDto {
     private Long id;
     private String email;
     private String nickname;
+    private String defaultFish;
     private LoginType loginType;
     private Long point;
 }

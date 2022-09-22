@@ -68,4 +68,10 @@ public class MemberController {
     memberService.nicknameDupCheck(userDetails,nicknameReqDto);
     return ResponseDto.success("사용가능한 닉네임입니다.");
   }
+
+  @GetMapping("/members/myProfile")
+  @ApiOperation(value = "마이프로필 조회")
+  public ResponseDto<?> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    return memberService.getMyProfile(userDetails);
+  }
 }
