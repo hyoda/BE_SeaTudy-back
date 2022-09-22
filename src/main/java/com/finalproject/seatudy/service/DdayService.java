@@ -7,6 +7,7 @@ import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
 import com.finalproject.seatudy.service.dto.request.DdayRequestDto;
 import com.finalproject.seatudy.service.dto.response.DdayResponseDto;
+import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class DdayService {
     private final DdayRepository ddayRepository;
 
     @Transactional
-    public DdayResponseDto createDday(UserDetailsImpl userDetails
+    public ResponseDto<?> createDday(UserDetailsImpl userDetails
                          , DdayRequestDto requestDto) throws ParseException {
 
         Member member = userDetails.getMember();
@@ -48,21 +49,21 @@ public class DdayService {
         ddayRepository.save(dday);
 
         DdayResponseDto responseDto = DdayResponseDto.fromEntity(dday);
-        return responseDto;
+        return ResponseDto.success(responseDto);
     }
 
-    public List<DdayResponseDto> getDday(UserDetailsImpl userDetails) {
+    public ResponseDto<?> getDday(UserDetailsImpl userDetails) {
 
         Member member = userDetails.getMember();
 
         List<Dday> ddayList = ddayRepository.findAllByMember(member);
 
-        return ddayList.stream().map(DdayResponseDto::fromEntity)
-                .collect(Collectors.toList());
+        return ResponseDto.success(ddayList.stream().map(DdayResponseDto::fromEntity)
+                .collect(Collectors.toList()));
     }
 
     @Transactional
-    public DdayResponseDto updateDday(UserDetailsImpl userDetails,
+    public ResponseDto<?> updateDday(UserDetailsImpl userDetails,
                                       Long ddayId,
                                       DdayRequestDto requestDto) throws ParseException {
 
@@ -85,11 +86,11 @@ public class DdayService {
         );
 
         DdayResponseDto responseDto = DdayResponseDto.fromEntity(dday);
-        return responseDto;
+        return ResponseDto.success(responseDto);
     }
 
     @Transactional
-    public String deleteDday(UserDetailsImpl userDetails, Long ddayId) {
+    public ResponseDto<?> deleteDday(UserDetailsImpl userDetails, Long ddayId) {
 
         Member member = userDetails.getMember();
 
@@ -103,7 +104,7 @@ public class DdayService {
 
         ddayRepository.deleteById(ddayId);
 
-        return "삭제되었습니다.";
+        return ResponseDto.success("삭제되었습니다.");
     }
 
     private Long ddayCalculate (DdayRequestDto requestDto) throws ParseException {
