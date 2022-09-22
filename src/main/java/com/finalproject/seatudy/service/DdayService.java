@@ -29,16 +29,16 @@ public class DdayService {
     private final DdayRepository ddayRepository;
 
     @Transactional
-    public ResponseDto<?> createDday(UserDetailsImpl userDetails
-                         , DdayRequestDto requestDto) throws ParseException {
-
-        Member member = userDetails.getMember();
-
-        Long ddayResult = ddayCalculate(requestDto);
-
+    public ResponseDto<?> createDday(UserDetailsImpl userDetails,
+                                     DdayRequestDto requestDto) throws ParseException {
         if (requestDto.getTitle().isEmpty()) {
             throw new CustomException(TITLE_NOT_EMPTY);
         }
+
+        Member member = userDetails.getMember();
+        checkDuplicateDday(requestDto, member);
+
+        Long ddayResult = ddayCalculate(requestDto.getTargetDay());
 
         Dday dday = Dday.builder()
                 .title(requestDto.getTitle())
@@ -48,15 +48,18 @@ public class DdayService {
                 .build();
         ddayRepository.save(dday);
 
-        DdayResponseDto responseDto = DdayResponseDto.fromEntity(dday);
-        return ResponseDto.success(responseDto);
+        return ResponseDto.success(DdayResponseDto.fromEntity(dday));
     }
 
-    public ResponseDto<?> getDday(UserDetailsImpl userDetails) {
+    public ResponseDto<?> getDday(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
 
         List<Dday> ddayList = ddayRepository.findAllByMember(member);
+        for (Dday dday : ddayList){
+            Long nowDay = ddayCalculate(dday.getTargetDay());
+            dday.dDayUpdate(nowDay);
+        }
 
         return ResponseDto.success(ddayList.stream().map(DdayResponseDto::fromEntity)
                 .collect(Collectors.toList()));
@@ -64,20 +67,21 @@ public class DdayService {
 
     @Transactional
     public ResponseDto<?> updateDday(UserDetailsImpl userDetails,
-                                      Long ddayId,
-                                      DdayRequestDto requestDto) throws ParseException {
-
-        Member member = userDetails.getMember();
+                                     Long ddayId,
+                                     DdayRequestDto requestDto) throws ParseException {
 
         Dday dday = ddayRepository.findById(ddayId).orElseThrow(
                 () -> new CustomException(DDAY_NOT_FOUND)
         );
 
+        Member member = userDetails.getMember();
+        checkDuplicateDday(requestDto, member);
+
         if (!member.getEmail().equals(dday.getMember().getEmail())){
             throw new CustomException(DDAY_FORBIDDEN_UPDATE);
         }
 
-        Long ddayResult = ddayCalculate(requestDto);
+        Long ddayResult = ddayCalculate(requestDto.getTargetDay());
 
         dday.update(
                 requestDto.getTitle(),
@@ -85,8 +89,7 @@ public class DdayService {
                 ddayResult
         );
 
-        DdayResponseDto responseDto = DdayResponseDto.fromEntity(dday);
-        return ResponseDto.success(responseDto);
+        return ResponseDto.success(DdayResponseDto.fromEntity(dday));
     }
 
     @Transactional
@@ -107,17 +110,21 @@ public class DdayService {
         return ResponseDto.success("삭제되었습니다.");
     }
 
-    private Long ddayCalculate (DdayRequestDto requestDto) throws ParseException {
-        String targetDay = requestDto.getTargetDay();
+    private Long ddayCalculate (String targetDay) throws ParseException {
+
         String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
 
         Date ddate = sdf.parse(targetDay);
         Date todate = sdf.parse(today);
         long Sec = (ddate.getTime() - todate.getTime()) / 1000; // 초
-//        long Min = (ddate.getTime() - todate.getTime()) / 60000; // 분
-//        long Hour = (ddate.getTime() - todate.getTime()) / 3600000; // 시
-        Long Days = (Sec / (24*60*60)); // 일자수
-        return Days;
+        return -(Sec / (24*60*60));
     }
 
+    private void checkDuplicateDday(DdayRequestDto requestDto, Member member) {
+        List<Dday> ddayResultList = ddayRepository.findAllByMemberAndTargetDay(member, requestDto.getTargetDay());
+
+        for (Dday dday : ddayResultList) {
+            if(requestDto.getTitle().equals(dday.getTitle())) throw new CustomException(DUPLICATE_DDAY);
+        }
+    }
 }

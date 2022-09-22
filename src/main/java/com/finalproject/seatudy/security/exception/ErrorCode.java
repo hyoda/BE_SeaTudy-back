@@ -43,6 +43,7 @@ public enum ErrorCode {
     DDAY_NOT_FOUND(HttpStatus.BAD_REQUEST, "디데이가 존재하지 않습니다." ),
     DDAY_FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 디데이를 수정할 수 없습니다."),
     DDAY_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 디데이를 삭제할 수 없습니다."),
+    DUPLICATE_DDAY(HttpStatus.CONFLICT, "동일한 D-day가 존재합니다."),
 
     // Time_check Error
     CHECKOUT_NOT_TRY(HttpStatus.BAD_REQUEST, "연속으로 체크인을 할 수 없습니다."),
