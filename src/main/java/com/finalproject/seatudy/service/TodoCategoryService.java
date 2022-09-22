@@ -37,11 +37,13 @@ public class TodoCategoryService {
                 () -> new CustomException(USER_NOT_FOUND)
         );
         List<TodoCategory> categories = todoCategoryRepository.findAllByCategoryName(todoCategoryRequestDto.getCategoryName());
+        List<TodoCategory> todoCategories = todoCategoryRepository.findAllByCategoryNameAndSelectDate(todoCategoryRequestDto.getCategoryName(), todoCategoryRequestDto.getSelectDate());
         if(todoCategoryRequestDto.getCategoryName().isEmpty()) {
             throw new CustomException(EMPTY_CATEGORY);
         }
+
         if(categories.size()>0) {
-            for (TodoCategory category : categories) {
+            for (TodoCategory category : todoCategories) {
                 if(category.getCategoryName().equals(todoCategoryRequestDto.getCategoryName())){
                     throw new CustomException(DUPLICATE_CATEGORY);
                 }
@@ -91,8 +93,18 @@ public class TodoCategoryService {
         TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
                 () -> new CustomException(CATEGORY_FORBIDDEN_UPDATE)
         );
+        List<TodoCategory> categories = todoCategoryRepository.findAllByCategoryName(todoCategoryUpdateDto.getCategoryName());
+        List<TodoCategory> todoCategories = todoCategoryRepository.findAllByCategoryNameAndSelectDate(todoCategoryUpdateDto.getCategoryName(), todoCategoryUpdateDto.getSelectDate());
         if(todoCategoryUpdateDto.getCategoryName().equals(todoCategory.getCategoryName())){
             throw new CustomException(DUPLICATE_CATEGORY);
+        }
+
+        if(categories.size()>0) {
+            for (TodoCategory category : todoCategories) {
+                if(category.getCategoryName().equals(todoCategoryUpdateDto.getCategoryName())){
+                    throw new CustomException(DUPLICATE_CATEGORY);
+                }
+            }
         }
         if (todoCategoryUpdateDto.getCategoryName().isEmpty()) {
             throw new CustomException(EMPTY_CATEGORY);
