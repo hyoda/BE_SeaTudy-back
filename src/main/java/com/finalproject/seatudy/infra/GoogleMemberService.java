@@ -64,6 +64,7 @@ public class GoogleMemberService {
                         .id(googleMember.getMemberId())
                         .email(googleMember.getEmail())
                         .nickname(googleMember.getNickname())
+                        .defaultFish("니모")
                         .point(point)
                         .build());
     }

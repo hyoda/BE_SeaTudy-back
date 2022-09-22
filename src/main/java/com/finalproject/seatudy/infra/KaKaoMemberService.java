@@ -64,6 +64,7 @@ public class KaKaoMemberService {
                         .id(kakaoMember.getMemberId())
                         .email(kakaoMember.getEmail())
                         .nickname(kakaoMember.getNickname())
+                        .defaultFish("니모")
                         .loginType(LoginType.KAKAO)
                         .point(point)
                         .build());

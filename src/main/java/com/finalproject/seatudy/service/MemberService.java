@@ -3,7 +3,9 @@ package com.finalproject.seatudy.service;
 
 import com.finalproject.seatudy.domain.LoginType;
 import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.entity.Rank;
 import com.finalproject.seatudy.domain.repository.MemberRepository;
+import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
 import com.finalproject.seatudy.security.exception.ErrorCode;
@@ -18,8 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -28,6 +33,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final RankRepository rankRepository;
 
     @Transactional
     public ResponseDto<?> updateNickname(UserDetailsImpl userDetails, NicknameReqDto nicknameReqDto) {
@@ -101,5 +107,23 @@ public class MemberService {
     public ResponseDto<?> logout(HttpServletRequest request) {
         request.removeAttribute("Authorization");
         return ResponseDto.success("로그아웃되었습니다.");
+    }
+
+    public ResponseDto<?> getMyProfile(UserDetailsImpl userDetails) {
+        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        List<Rank> allMemberList = rankRepository.findAllByMember(member);
+        Long point = totalPoint(allMemberList);
+
+        MemberResDto responseDto = MemberResDto.builder()
+                .id(member.getMemberId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .defaultFish("니모")
+                .loginType(member.getLoginType())
+                .point(point)
+                .build();
+        return ResponseDto.success(responseDto);
     }
 }
