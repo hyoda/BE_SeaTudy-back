@@ -30,7 +30,7 @@ public class DdayContoller {
 
     @GetMapping("/ddays")
     @ApiOperation(value = "D-day 조회")
-    public ResponseDto<?> getDday(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseDto<?> getDday(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
         return ddayService.getDday(userDetails);
     }
 

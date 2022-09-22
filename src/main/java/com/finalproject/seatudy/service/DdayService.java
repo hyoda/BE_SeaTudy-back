@@ -38,7 +38,7 @@ public class DdayService {
         Member member = userDetails.getMember();
         checkDuplicateDday(requestDto, member);
 
-        Long ddayResult = ddayCalculate(requestDto);
+        Long ddayResult = ddayCalculate(requestDto.getTargetDay());
 
         Dday dday = Dday.builder()
                 .title(requestDto.getTitle())
@@ -51,11 +51,15 @@ public class DdayService {
         return ResponseDto.success(DdayResponseDto.fromEntity(dday));
     }
 
-    public ResponseDto<?> getDday(UserDetailsImpl userDetails) {
+    public ResponseDto<?> getDday(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
 
         List<Dday> ddayList = ddayRepository.findAllByMember(member);
+        for (Dday dday : ddayList){
+            Long nowDay = ddayCalculate(dday.getTargetDay());
+            dday.dDayUpdate(nowDay);
+        }
 
         return ResponseDto.success(ddayList.stream().map(DdayResponseDto::fromEntity)
                 .collect(Collectors.toList()));
@@ -77,7 +81,7 @@ public class DdayService {
             throw new CustomException(DDAY_FORBIDDEN_UPDATE);
         }
 
-        Long ddayResult = ddayCalculate(requestDto);
+        Long ddayResult = ddayCalculate(requestDto.getTargetDay());
 
         dday.update(
                 requestDto.getTitle(),
@@ -106,14 +110,14 @@ public class DdayService {
         return ResponseDto.success("삭제되었습니다.");
     }
 
-    private Long ddayCalculate (DdayRequestDto requestDto) throws ParseException {
-        String targetDay = requestDto.getTargetDay();
+    private Long ddayCalculate (String targetDay) throws ParseException {
+
         String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
 
         Date ddate = sdf.parse(targetDay);
         Date todate = sdf.parse(today);
         long Sec = (ddate.getTime() - todate.getTime()) / 1000; // 초
-        return Sec / (24*60*60);
+        return -(Sec / (24*60*60));
     }
 
     private void checkDuplicateDday(DdayRequestDto requestDto, Member member) {
