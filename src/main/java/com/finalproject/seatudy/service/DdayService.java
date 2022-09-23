@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +39,8 @@ public class DdayService {
         Member member = userDetails.getMember();
         checkDuplicateDday(requestDto, member);
 
-        Long ddayResult = ddayCalculate(requestDto.getTargetDay());
+        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
+        Long ddayResult = ddayCalculate(requestDto.getTargetDay(), today);
 
         Dday dday = Dday.builder()
                 .title(requestDto.getTitle())
@@ -54,15 +56,34 @@ public class DdayService {
     public ResponseDto<?> getDday(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
+        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
 
         List<Dday> ddayList = ddayRepository.findAllByMember(member);
         for (Dday dday : ddayList){
-            Long nowDay = ddayCalculate(dday.getTargetDay());
+            Long nowDay = ddayCalculate(dday.getTargetDay(), today);
             dday.dDayUpdate(nowDay);
         }
 
         return ResponseDto.success(ddayList.stream().map(DdayResponseDto::fromEntity)
                 .collect(Collectors.toList()));
+    }
+
+    public ResponseDto<?> getDdayByDates(UserDetailsImpl userDetails, String selectDate) throws ParseException {
+        Member member = userDetails.getMember();
+
+        List<Dday> ddayList = ddayRepository.findAllByMember(member);
+        List<DdayResponseDto> ddayResponseDtos = new ArrayList<>();
+
+        for (Dday dday : ddayList) {
+            ddayResponseDtos.add(
+                    DdayResponseDto.builder()
+                            .dDayId(dday.getDdayId())
+                            .title(dday.getTitle())
+                            .targetDay(dday.getTargetDay())
+                            .dDay(ddayCalculate(dday.getTargetDay(), selectDate))
+                            .build());
+        }
+        return ResponseDto.success(ddayResponseDtos);
     }
 
     @Transactional
@@ -81,7 +102,8 @@ public class DdayService {
             throw new CustomException(DDAY_FORBIDDEN_UPDATE);
         }
 
-        Long ddayResult = ddayCalculate(requestDto.getTargetDay());
+        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
+        Long ddayResult = ddayCalculate(requestDto.getTargetDay(), today);
 
         dday.update(
                 requestDto.getTitle(),
@@ -110,12 +132,9 @@ public class DdayService {
         return ResponseDto.success("삭제되었습니다.");
     }
 
-    private Long ddayCalculate (String targetDay) throws ParseException {
-
-        String today = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
-
+    private Long ddayCalculate (String targetDay, String baseDay) throws ParseException {
         Date ddate = sdf.parse(targetDay);
-        Date todate = sdf.parse(today);
+        Date todate = sdf.parse(baseDay);
         long Sec = (ddate.getTime() - todate.getTime()) / 1000; // 초
         return -(Sec / (24*60*60));
     }
