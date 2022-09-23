@@ -34,6 +34,15 @@ public class DdayContoller {
         return ddayService.getDday(userDetails);
     }
 
+    @GetMapping("/ddays/dates")
+    @ApiOperation(value = "D-day 날짜별 조회")
+    @ApiImplicitParam(name = "selectDate", value = "날짜 선택")
+    public ResponseDto<?> getDdayByDates(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                         @RequestParam String selectDate) throws ParseException {
+        return ddayService.getDdayByDates(userDetails, selectDate);
+    }
+
+
     @PutMapping("/ddays/{ddayId}")
     @ApiOperation(value = "D-day 수정")
     @ApiImplicitParam(name = "ddayId", value = "D-day 아이디")
