@@ -30,19 +30,18 @@ import static com.finalproject.seatudy.service.dto.response.TodoListResponseDto.
 public class TodoCategoryService {
 
     private final TodoCategoryRepository todoCategoryRepository;
-    private final TodoListRepository todoListRepository;
     private final MemberRepository memberRepository;
     public ResponseDto<?> createTodoCategory(UserDetailsImpl userDetails, TodoCategoryRequestDto todoCategoryRequestDto){
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        List<TodoCategory> categories = todoCategoryRepository.findAllByCategoryName(todoCategoryRequestDto.getCategoryName());
-        List<TodoCategory> todoCategories = todoCategoryRepository.findAllByCategoryNameAndSelectDate(todoCategoryRequestDto.getCategoryName(), todoCategoryRequestDto.getSelectDate());
         if(todoCategoryRequestDto.getCategoryName().isEmpty()) {
             throw new CustomException(EMPTY_CATEGORY);
         }
+        List<TodoCategory> todoCategories = todoCategoryRepository.findAllByCategoryNameAndSelectDate(todoCategoryRequestDto.getCategoryName(),
+                todoCategoryRequestDto.getSelectDate());
 
-        if(categories.size()>0) {
+        if(todoCategories.size()>0) {
             for (TodoCategory category : todoCategories) {
                 if(category.getCategoryName().equals(todoCategoryRequestDto.getCategoryName())){
                     throw new CustomException(DUPLICATE_CATEGORY);
@@ -56,14 +55,7 @@ public class TodoCategoryService {
                 .build();
         todoCategoryRepository.save(todoCategory);
 
-        TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
-                .categoryId(todoCategory.getCategoryId())
-                .categoryName(todoCategory.getCategoryName())
-                .selectDate(todoCategory.getSelectDate())
-                .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                .todoList(new ArrayList<>())
-                .build();
-
+        TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.fromEntity(member, todoCategory);
         return ResponseDto.success(todoCategoryResponseDto);
     }
 
@@ -75,13 +67,7 @@ public class TodoCategoryService {
         List<TodoCategoryResponseDto> todoCategoryResponseDtos = new ArrayList<>();
 
         for (TodoCategory todoCategory : todoCategories) {
-            todoCategoryResponseDtos.add(TodoCategoryResponseDto.builder()
-                    .categoryId(todoCategory.getCategoryId())
-                    .categoryName(todoCategory.getCategoryName())
-                    .selectDate(todoCategory.getSelectDate())
-                    .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                    .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
-                    .build());
+            todoCategoryResponseDtos.add(TodoCategoryResponseDto.fromEntity(member, todoCategory));
         }
         return ResponseDto.success(todoCategoryResponseDtos);
     }
@@ -93,33 +79,23 @@ public class TodoCategoryService {
         TodoCategory todoCategory = todoCategoryRepository.findById(todoCategoryId).orElseThrow(
                 () -> new CustomException(CATEGORY_FORBIDDEN_UPDATE)
         );
-        List<TodoCategory> categories = todoCategoryRepository.findAllByCategoryName(todoCategoryUpdateDto.getCategoryName());
-        List<TodoCategory> todoCategories = todoCategoryRepository.findAllByCategoryNameAndSelectDate(todoCategoryUpdateDto.getCategoryName(), todoCategoryUpdateDto.getSelectDate());
-        if(todoCategoryUpdateDto.getCategoryName().equals(todoCategory.getCategoryName())){
-            throw new CustomException(DUPLICATE_CATEGORY);
-        }
-
-        if(categories.size()>0) {
-            for (TodoCategory category : todoCategories) {
-                if(category.getCategoryName().equals(todoCategoryUpdateDto.getCategoryName())){
-                    throw new CustomException(DUPLICATE_CATEGORY);
-                }
-            }
-        }
         if (todoCategoryUpdateDto.getCategoryName().isEmpty()) {
             throw new CustomException(EMPTY_CATEGORY);
+        }
+        if(todoCategoryUpdateDto.getCategoryName().equals(todoCategory.getCategoryName())){
+            throw new CustomException(CURRENT_CATEGORYNAME);
+        }
+        List<TodoCategory> todoCategories = todoCategoryRepository.findAllByCategoryNameAndSelectDate(todoCategoryUpdateDto.getCategoryName(), todoCategoryUpdateDto.getSelectDate());
+        for (TodoCategory category : todoCategories) {
+            if(category.getCategoryName().equals(todoCategoryUpdateDto.getCategoryName())){
+                throw new CustomException(DUPLICATE_CATEGORY);
+            }
         }
 
         if(member.getEmail().equals(todoCategory.getMember().getEmail())){
             todoCategory.update(todoCategoryUpdateDto);
 
-            TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.builder()
-                    .categoryId(todoCategory.getCategoryId())
-                    .categoryName(todoCategory.getCategoryName())
-                    .selectDate(todoCategory.getSelectDate())
-                    .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                    .todoList(todoCategory.getTodoList().stream().map(TodoListResDto::new).collect(Collectors.toList()))
-                    .build();
+            TodoCategoryResponseDto todoCategoryResponseDto = TodoCategoryResponseDto.fromEntity(member, todoCategory);
 
             return ResponseDto.success(todoCategoryResponseDto);
         }
@@ -132,19 +108,10 @@ public class TodoCategoryService {
                 () -> new CustomException(USER_NOT_FOUND)
         );
         List<TodoCategory> todoCategories= todoCategoryRepository.findAllBySelectDateContaining(selectDate);
-        List<TodoList> todoLists = todoListRepository.findAllBySelectDateContaining(selectDate);
         List<TodoCategoryResponseDto> todoCategoryResponseDtos = new ArrayList<>();
 
         for (TodoCategory todoCategory : todoCategories){
-            todoCategoryResponseDtos.add(TodoCategoryResponseDto.builder()
-                    .categoryId(todoCategory.getCategoryId())
-                    .categoryName(todoCategory.getCategoryName())
-                    .selectDate(todoCategory.getSelectDate())
-                    .memberCateDto(MemberCateDto.builder().memberId(member.getMemberId()).email(member.getEmail()).build())
-                    .todoList(todoLists.stream().filter(todoList -> todoList.getTodoCategory().equals(todoCategory))
-                            .map(TodoListResDto::new).collect(Collectors.toList()))
-                    .build());
-
+            todoCategoryResponseDtos.add(TodoCategoryResponseDto.fromEntity(member, todoCategory));
         }
         return ResponseDto.success(todoCategoryResponseDtos);
     }

@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.service.dto.response;
 
+import com.finalproject.seatudy.domain.entity.Member;
 import lombok.*;
 
 @Builder
@@ -9,4 +10,9 @@ import lombok.*;
 public class MemberCateDto {
     private Long memberId;
     private String email;
+
+    public MemberCateDto(Member member) {
+        this.memberId = member.getMemberId();
+        this.email = member.getEmail();
+    }
 }

@@ -37,6 +37,7 @@ public enum ErrorCode {
     CATEGORY_FORBIDDEN_DELETE(HttpStatus.FORBIDDEN, "현재 사용자는 해당 카테고리를 삭제할 수 없습니다."),
     DUPLICATE_CATEGORY(HttpStatus.CONFLICT, "동일한 카테고리가 존재합니다."),
     EMPTY_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리 이름을 입력해주세요(최소 1자이상)"),
+    CURRENT_CATEGORYNAME(HttpStatus.CONFLICT, "현재와 같은 카테고리 이름입니다."),
 
     // D-day Error
     TITLE_NOT_EMPTY(HttpStatus.BAD_REQUEST,"타이틀을 입력해야 합니다." ),
