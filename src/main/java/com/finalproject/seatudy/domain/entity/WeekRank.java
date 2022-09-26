@@ -3,6 +3,8 @@ package com.finalproject.seatudy.domain.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "weekRanks")
 @AllArgsConstructor
@@ -24,9 +26,13 @@ public class WeekRank {
     private String totalStudy;
 
     @Column
-    private String date;
+    private int week;
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @OneToMany(mappedBy = "week")
+    private List<Rank> ranks = new ArrayList<>();
+
 }
