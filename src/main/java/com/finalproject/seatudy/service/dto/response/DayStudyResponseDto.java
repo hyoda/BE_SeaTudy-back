@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @Getter
 public class DayStudyResponseDto {
     private String date;
-    private int HH;
+    private int hour;
 }

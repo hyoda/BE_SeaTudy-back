@@ -28,6 +28,9 @@ public class WeekRank {
     @Column
     private int week;
 
+    @Column
+    private int year;
+
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
