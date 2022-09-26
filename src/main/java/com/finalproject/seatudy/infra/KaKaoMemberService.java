@@ -45,26 +45,21 @@ public class KaKaoMemberService {
 
     public ResponseDto<?> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         String kakaoACTokens = getKakaoTokens(code);
-
         MemberResDto kakaoUserInfo = getKakaoUserInfo(kakaoACTokens);
-
         Member kakaoMember = memberService.registerSocialLoginMemberIfNeed(kakaoUserInfo, LoginType.KAKAO);
-
         String kakaoAC = jwtTokenUtils.generateJwtToken(kakaoMember);
         memberService.tokenToHeaders(kakaoAC, response);
 
-        log.info("kakao 로그인 완료: {}",kakaoMember.getEmail());
         List<Rank> allMemberList = rankRepository.findAllByMember(kakaoMember);
-
         Long point = totalPoint(allMemberList);
 
-        log.info("카카오 로그인 완료: {}",kakaoMember.getEmail());
+        log.info("kakao 로그인 완료: {}",kakaoMember.getEmail());
         return ResponseDto.success(
                 MemberResDto.builder()
                         .id(kakaoMember.getMemberId())
                         .email(kakaoMember.getEmail())
                         .nickname(kakaoMember.getNickname())
-                        .defaultFish("니모")
+                        .defaultFish(kakaoMember.getDefaultFishUrl())
                         .loginType(LoginType.KAKAO)
                         .point(point)
                         .build());
@@ -115,14 +110,12 @@ public class KaKaoMemberService {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
         long userId = jsonNode.get("id").asLong();
-        String nickname = jsonNode.get("properties").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
 
         log.info("Kakao에서 사용자 정보획득 완료: {}", email);
         return MemberResDto.builder()
                 .id(userId)
                 .email(email)
-                .nickname(nickname)
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import com.finalproject.seatudy.infra.KaKaoMemberService;
 import com.finalproject.seatudy.infra.NaverMemberService;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.service.MemberService;
+import com.finalproject.seatudy.service.dto.request.FishReqDto;
 import com.finalproject.seatudy.service.dto.request.NicknameReqDto;
 import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import io.swagger.annotations.ApiImplicitParam;
@@ -73,5 +74,19 @@ public class MemberController {
   @ApiOperation(value = "마이프로필 조회")
   public ResponseDto<?> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails){
     return memberService.getMyProfile(userDetails);
+  }
+
+  @PutMapping("/members/myProfile/fishImages")
+  @ApiOperation(value = "프로필 fish 이미지 변경")
+  public ResponseDto<?> changeMyProfileFishImage(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                 @RequestBody FishReqDto fishReqDto) {
+    return memberService.updateFishImage(userDetails, fishReqDto.getFishName());
+  }
+
+  @GetMapping("/fishes/images")
+  @ApiOperation(value = "fish 이미지 조회")
+  @ApiImplicitParam(name = "fishName", value = "fish 이름")
+  public ResponseDto<?> getFishImage(@RequestParam String fishName) {
+    return memberService.getFishImage(fishName);
   }
 }

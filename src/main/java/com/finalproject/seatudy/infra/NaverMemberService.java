@@ -45,26 +45,21 @@ public class NaverMemberService {
 
     public ResponseDto<?> naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         String naverACTokens = getNaverTokens(code, state);
-
         MemberResDto naverUserDto = getNaverUserInfo(naverACTokens);
-
-        Member member = memberService.registerSocialLoginMemberIfNeed(naverUserDto, LoginType.NAVER);
-
-        String naverAC = jwtTokenUtils.generateJwtToken(member);
+        Member naverMember = memberService.registerSocialLoginMemberIfNeed(naverUserDto, LoginType.NAVER);
+        String naverAC = jwtTokenUtils.generateJwtToken(naverMember);
         memberService.tokenToHeaders(naverAC, response);
 
-        log.info("Naver 로그인 완료: {}", member.getEmail());
-        List<Rank> allMemberList = rankRepository.findAllByMember(member);
-
+        List<Rank> allMemberList = rankRepository.findAllByMember(naverMember);
         Long point = totalPoint(allMemberList);
 
-        log.info("네이버 로그인 완료: {}", member.getEmail());
+        log.info("Naver 로그인 완료: {}", naverMember.getEmail());
         return ResponseDto.success(
                 MemberResDto.builder()
-                        .id(member.getMemberId())
-                        .email(member.getEmail())
-                        .nickname(member.getNickname())
-                        .defaultFish("니모")
+                        .id(naverMember.getMemberId())
+                        .email(naverMember.getEmail())
+                        .nickname(naverMember.getNickname())
+                        .defaultFish(naverMember.getDefaultFishUrl())
                         .loginType(LoginType.NAVER)
                         .point(point)
                         .build()

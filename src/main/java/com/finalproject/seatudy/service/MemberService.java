@@ -2,14 +2,17 @@ package com.finalproject.seatudy.service;
 
 
 import com.finalproject.seatudy.domain.LoginType;
+import com.finalproject.seatudy.domain.entity.Fish;
 import com.finalproject.seatudy.domain.entity.Member;
 import com.finalproject.seatudy.domain.entity.Rank;
+import com.finalproject.seatudy.domain.repository.FishRepository;
 import com.finalproject.seatudy.domain.repository.MemberRepository;
 import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
 import com.finalproject.seatudy.security.exception.ErrorCode;
 import com.finalproject.seatudy.service.dto.request.NicknameReqDto;
+import com.finalproject.seatudy.service.dto.response.FishInfoResDto;
 import com.finalproject.seatudy.service.dto.response.MemberResDto;
 import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +38,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final RankRepository rankRepository;
+    private final FishRepository fishRepository;
 
     @Transactional
     public ResponseDto<?> updateNickname(UserDetailsImpl userDetails, NicknameReqDto nicknameReqDto) {
@@ -42,7 +47,7 @@ public class MemberService {
         );
 
         if(nicknameDupCheck(userDetails, nicknameReqDto)){
-            findMember.update(nicknameReqDto);
+            findMember.updateNickname(nicknameReqDto);
             log.info("{} / 닉네임 정보변경: {}", findMember.getEmail(), findMember.getNickname());
         }
 
@@ -94,6 +99,7 @@ public class MemberService {
                     .nickname(name)
                     .password(passwordEncoder.encode(password))
                     .loginType(loginType)
+                    .defaultFishUrl(fishRepository.findByFishId(1L).getFishImageUrl())
                     .point(0L)
                     .build();
 
@@ -102,11 +108,6 @@ public class MemberService {
             throw new CustomException(ErrorCode.DUPLICATE_REGISTER);
         }
         return member;
-    }
-
-    public ResponseDto<?> logout(HttpServletRequest request) {
-        request.removeAttribute("Authorization");
-        return ResponseDto.success("로그아웃되었습니다.");
     }
 
     public ResponseDto<?> getMyProfile(UserDetailsImpl userDetails) {
@@ -120,10 +121,43 @@ public class MemberService {
                 .id(member.getMemberId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
-                .defaultFish("니모")
+                .defaultFish(member.getDefaultFishUrl())
                 .loginType(member.getLoginType())
                 .point(point)
                 .build();
         return ResponseDto.success(responseDto);
+    }
+
+    public ResponseDto<?> getFishImage(String fishName) {
+        Fish fishInfo = getFishByName(fishName);
+        return ResponseDto.success(FishInfoResDto.builder()
+                .fishNum(fishInfo.getFishId())
+                .fishName(fishInfo.getFishName())
+                .fishImageUrl(fishInfo.getFishImageUrl())
+                .build());
+    }
+
+    @Transactional
+    public ResponseDto<?> updateFishImage(UserDetailsImpl userDetails, String fishName) {
+        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        Fish foundFish = getFishByName(fishName);
+        member.updateDefaultFish(foundFish.getFishImageUrl());
+
+        return ResponseDto.success(MemberResDto.builder()
+                .id(member.getMemberId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .defaultFish(member.getDefaultFishUrl())
+                .loginType(member.getLoginType())
+                .point(member.getPoint())
+                .build());
+    }
+
+    private Fish getFishByName(String fishName) {
+        String decodeFishNameToKr = URLDecoder.decode(fishName, StandardCharsets.UTF_8);
+        return fishRepository.findByFishName(decodeFishNameToKr);
     }
 }

@@ -46,16 +46,12 @@ public class GoogleMemberService {
 
     public ResponseDto<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         String googleACTokens = getGoogleTokens(code);
-
         MemberResDto googleUserInfo = getGoogleUserInfo(googleACTokens);
-
         Member googleMember = memberService.registerSocialLoginMemberIfNeed(googleUserInfo, LoginType.GOOGLE);
-
         String googleAC = jwtTokenUtils.generateJwtToken(googleMember);
         memberService.tokenToHeaders(googleAC, response);
 
         List<Rank> allMemberList = rankRepository.findAllByMember(googleMember);
-
         Long point = totalPoint(allMemberList);
 
         log.info("Google 로그인 완료: {}",googleMember.getEmail());
@@ -64,7 +60,7 @@ public class GoogleMemberService {
                         .id(googleMember.getMemberId())
                         .email(googleMember.getEmail())
                         .nickname(googleMember.getNickname())
-                        .defaultFish("니모")
+                        .defaultFish(googleMember.getDefaultFishUrl())
                         .point(point)
                         .build());
     }
@@ -118,12 +114,10 @@ public class GoogleMemberService {
 
         Long googleId = jsonNode.get("sub").asLong();
         String email = jsonNode.get("email").asText();
-        String name = jsonNode.get("name").asText();
 
         return MemberResDto.builder()
                 .id(googleId)
                 .email(email)
-                .nickname(name)
                 .build();
     }
 }

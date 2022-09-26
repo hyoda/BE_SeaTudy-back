@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 
@@ -28,7 +27,7 @@ public class Member extends TimeStamped {
     private String nickname;
 
     @Column
-    private String defaultFish;
+    private String defaultFishUrl;
 
     @Column
     private String password;
@@ -39,7 +38,11 @@ public class Member extends TimeStamped {
     @Column
     private Long point;
 
-    public void update(NicknameReqDto nicknameReqDto) {
+    public void updateNickname(NicknameReqDto nicknameReqDto) {
         this.nickname = nicknameReqDto.getNickname();
+    }
+
+    public void updateDefaultFish(String fishName) {
+        this.defaultFishUrl = fishName;
     }
 }
