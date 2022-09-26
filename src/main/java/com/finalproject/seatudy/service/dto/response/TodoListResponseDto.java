@@ -27,22 +27,20 @@ public class TodoListResponseDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class TodoCateResDto {
-        private TodoCateShortResDto todoCateShortResDto;
-        private Long todoId;
-        private String content;
-        private String selectDate;
-        private int done;
-    }
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class TodoListCateResDto {
         private Long todoId;
         private String content;
         private int done;
         private Long categoryId;
         private String selectDate;
+
+        public static TodoListCateResDto fromEntity(TodoList todoList) {
+            return new TodoListCateResDto(
+                    todoList.getTodoId(),
+                    todoList.getContent(),
+                    todoList.getDone(),
+                    todoList.getTodoCategory().getCategoryId(),
+                    todoList.getSelectDate());
+        }
     }
 }
