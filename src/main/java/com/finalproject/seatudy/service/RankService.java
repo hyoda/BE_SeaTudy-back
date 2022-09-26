@@ -101,38 +101,20 @@ public class RankService {
         return ResponseDto.success(responseDtos);
     }
 
-    public ResponseDto<?> getWeekStudy(UserDetailsImpl userDetails) throws ParseException {
+    public ResponseDto<?> getWeekStudy(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
 
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
-
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
+        List<WeekStudyResponseDto> responseDtos = new ArrayList<>();
+        List<WeekRank> weekStudies = weekRankRepository.findTop4ByMemberOrderByWeekDesc(member);
+        for (WeekRank weekStudy : weekStudies) {
+            String[] arrayFind = weekStudy.getWeekStudy().split(":");
+            int weekHH = Integer.parseInt(arrayFind[0]);
+            int week = weekStudy.getWeek();
+            responseDtos.add(new WeekStudyResponseDto(week, weekHH));
         }
-        String setToday = dateFormat(today);
 
-        String strDate = setToday;
-        Date weekDate = sdf.parse(strDate);
-        weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(weekDate);
 
-        int week = cal.get(Calendar.WEEK_OF_YEAR)-1;
-
-        Optional<WeekRank> weekStudy = weekRankRepository.findByMemberAndWeek(member, week);
-        String[] arrayFind = weekStudy.get().getWeekStudy().split(":");
-        int weekHH = Integer.parseInt(arrayFind[0]);
-        WeekStudyResponseDto responseDto = new WeekStudyResponseDto(week, weekHH);
-
-        return ResponseDto.success(responseDto);
+        return ResponseDto.success(responseDtos);
     }
 
     public ResponseDto<?> getWeekStudyDetail(String date, UserDetailsImpl userDetails) throws ParseException {
@@ -180,7 +162,7 @@ public class RankService {
         cal.setTime(date);
 
         int year = cal.get(Calendar.YEAR);
-        int week = cal.get(Calendar.WEEK_OF_YEAR)-1;
+        int week = cal.get(Calendar.WEEK_OF_YEAR) - 1;
 
         List<Member> members = memberRepository.findAll();
         for (Member member : members) {
@@ -227,8 +209,6 @@ public class RankService {
             weekRankRepository.save(afterWeekRank);
         }
 
-//        List<WeekRank> weekRanks = weekRankRepository.findAll();
-//        return weekRanks;
     }
 
 }

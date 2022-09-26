@@ -3,16 +3,12 @@ package com.finalproject.seatudy.service;
 import com.finalproject.seatudy.domain.entity.Member;
 import com.finalproject.seatudy.domain.entity.Rank;
 import com.finalproject.seatudy.domain.entity.TimeCheck;
-import com.finalproject.seatudy.domain.entity.WeekRank;
-import com.finalproject.seatudy.domain.repository.MemberRepository;
 import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.domain.repository.TimeCheckRepository;
-import com.finalproject.seatudy.domain.repository.WeekRankRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,9 +33,6 @@ public class TimeCheckService {
 
     private final TimeCheckRepository timeCheckRepository;
     private final RankRepository rankRepository;
-    private final MemberRepository memberRepository;
-    private final WeekRankRepository weekRankRepository;
-
 
     @Transactional
     public CheckIn checkIn(UserDetailsImpl userDetails) throws ParseException {

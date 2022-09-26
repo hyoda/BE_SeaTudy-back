@@ -13,6 +13,5 @@ public interface RankRepository extends JpaRepository<Rank, Long> {
     List<Rank> findTop20ByDateOrderByDayStudyDesc(String date);
     List<Rank> findAllByMemberAndWeek(Member member, int week);
     List<Rank> findAllByMemberAndDateContaining(Member member, String date);
-    List<Rank> findAllByWeek(int week);
 
 }

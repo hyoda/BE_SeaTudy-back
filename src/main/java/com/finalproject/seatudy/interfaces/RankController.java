@@ -38,7 +38,7 @@ public class RankController {
 
     @GetMapping("/weekStudies")
     @ApiOperation(value = "주간 공부량 조회")
-    public ResponseDto<?> getWeekStudy(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
+    public ResponseDto<?> getWeekStudy(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return rankService.getWeekStudy(userDetails);
     }
 
