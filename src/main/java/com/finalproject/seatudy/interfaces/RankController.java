@@ -19,14 +19,14 @@ public class RankController {
 
     @GetMapping("/dayRanks")
     @ApiOperation(value = "일일 랭킹 조회")
-    public ResponseDto<?> getDayRank(@RequestParam String date) {
-        return rankService.getDayRank(date);
+    public ResponseDto<?> getDayRank() throws ParseException {
+        return rankService.getDayRank();
     }
 
     @GetMapping("/weekDayRanks")
     @ApiOperation(value = "주간 랭킹 조회")
-    public ResponseDto<?> getWeekDayRank(@RequestParam String date) throws ParseException {
-        return rankService.getWeekDayRank(date);
+    public ResponseDto<?> getWeekDayRank() throws ParseException {
+        return rankService.getWeekDayRank();
     }
 
     @GetMapping("/dayStudies")

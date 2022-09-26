@@ -19,7 +19,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.finalproject.seatudy.service.util.CalendarUtil.totalTime;
+import static com.finalproject.seatudy.service.util.CalendarUtil.*;
 import static com.finalproject.seatudy.service.util.Formatter.sdf;
 import static com.finalproject.seatudy.service.util.Formatter.stf;
 
@@ -32,24 +32,57 @@ public class RankService {
     private final WeekRankRepository weekRankRepository;
     private final MemberRepository memberRepository;
 
-    public ResponseDto<?> getDayRank(String date) {
-        List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(date);
+    public ResponseDto<?> getDayRank() throws ParseException {
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1).toString();
+
+        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
+        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+
+        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
+        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
+
+        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
+        if (today.compareTo(setDay) < 0) {
+            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
+        }
+        String setToday = dateFormat(today);
+
+        List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
 
         return ResponseDto.success(dayStudyRanks.stream().map(RankResponseDto::fromEntity)
                 .collect(Collectors.toList()));
     }
 
-    public ResponseDto<?> getWeekDayRank(String date) throws ParseException {
+    public ResponseDto<?> getWeekDayRank() throws ParseException {
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
 
-        String strDate = date;
+        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
+        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+
+        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
+        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
+
+        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
+        if (today.compareTo(setDay) < 0) {
+            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
+        }
+        String setToday = dateFormat(today);
+
+        String strDate = setToday;
         Date weekDate = sdf.parse(strDate);
         weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
         Calendar cal = Calendar.getInstance();
         cal.setFirstDayOfWeek(Calendar.MONDAY);
         cal.setTime(weekDate);
 
-        int week = cal.get(Calendar.WEEK_OF_YEAR);
-        List<WeekRank> weekDayStudyRanks = weekRankRepository.findTop20ByWeekOrderByWeekStudyDesc(week);
+        int year = cal.get(Calendar.YEAR);
+        int week = cal.get(Calendar.WEEK_OF_YEAR)-2;
+        if (week == 0) {
+            year -= 1;
+            week = 53;
+        }
+
+        List<WeekRank> weekDayStudyRanks = weekRankRepository.findTop20ByYearAndWeekOrderByWeekStudyDesc(year,week);
 
         return ResponseDto.success(weekDayStudyRanks.stream().map(WeekRankResponseDto::fromEntity)
                 .collect(Collectors.toList()));
@@ -71,9 +104,8 @@ public class RankService {
     public ResponseDto<?> getWeekStudy(String date, UserDetailsImpl userDetails) throws ParseException {
         Member member = userDetails.getMember();
 
-        Date weekDate = null;
         String strDate = date;
-        weekDate = sdf.parse(strDate);
+        Date weekDate = sdf.parse(strDate);
         weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
         Calendar cal = Calendar.getInstance();
         cal.setFirstDayOfWeek(Calendar.MONDAY);
@@ -126,14 +158,14 @@ public class RankService {
     @Scheduled(cron = " 50 59 4 * * 1 ")
     public void weekStudy() throws ParseException {
         log.info("일주일 공부시간 저장 시작");
-        Date date = null;
         String strDate = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
-        date = sdf.parse(strDate);
+        Date date = sdf.parse(strDate);
         date = new Date(date.getTime() + (1000 * 60 * 60 * 24 - 1));
         Calendar cal = Calendar.getInstance();
         cal.setFirstDayOfWeek(Calendar.MONDAY);
         cal.setTime(date);
 
+        int year = cal.get(Calendar.YEAR);
         int week = cal.get(Calendar.WEEK_OF_YEAR);
 
         List<Member> members = memberRepository.findAll();
@@ -150,6 +182,7 @@ public class RankService {
                         .weekStudy(weekStudy)
                         .totalStudy(weekStudy)
                         .week(week)
+                        .year(year)
                         .member(member)
                         .build();
                 weekRankRepository.save(firstWeekRank);
@@ -174,6 +207,7 @@ public class RankService {
                     .weekStudy(weekStudyFormat)
                     .totalStudy(totalTime)
                     .week(week)
+                    .year(year)
                     .member(member)
                     .build();
             weekRankRepository.save(afterWeekRank);

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface WeekRankRepository extends JpaRepository<WeekRank, Long> {
     List<WeekRank> findAllByMember(Member member);
-    List<WeekRank> findTop20ByWeekOrderByWeekStudyDesc(int week);
+    List<WeekRank> findTop20ByYearAndWeekOrderByWeekStudyDesc(int year, int week);
     Optional<WeekRank> findByMemberAndWeek(Member member, int week);
 
 }

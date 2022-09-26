@@ -294,16 +294,17 @@ public class TimeCheckService {
             return checkOut;
         }
 
-        String strDate = date;
+        String strDate = setToday;
         Date weekDate = sdf.parse(strDate);
         weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
         Calendar cal = Calendar.getInstance();
         cal.setFirstDayOfWeek(Calendar.MONDAY);
         cal.setTime(weekDate);
 
-        int week = cal.get(Calendar.WEEK_OF_YEAR);
-
-        week = (today.compareTo(setDay) < 0) ? week-1 : week;
+        int week = cal.get(Calendar.WEEK_OF_YEAR)-1;
+        if (week == 0){
+            week = 53;
+        }
 
         lastCheckIn.setCheckOut(nowTime);
         Rank rank = Rank.builder()
