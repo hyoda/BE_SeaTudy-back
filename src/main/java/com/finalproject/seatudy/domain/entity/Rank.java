@@ -17,16 +17,17 @@ public class Rank {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rankId;
 
-    // 일일 총 공부한 시간
     @Column
     private String dayStudy;
 
-    // 총 공부한 시간
     @Column
     private String totalStudy;
 
     @Column
     private String date;
+
+    @Column
+    private int week;
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")

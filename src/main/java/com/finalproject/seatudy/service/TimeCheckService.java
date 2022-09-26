@@ -10,7 +10,6 @@ import com.finalproject.seatudy.domain.repository.TimeCheckRepository;
 import com.finalproject.seatudy.domain.repository.WeekRankRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.security.exception.CustomException;
-import com.finalproject.seatudy.service.dto.response.TimeCheckListDto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,9 +28,7 @@ import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKIN_NOT_
 import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKOUT_NOT_TRY;
 import static com.finalproject.seatudy.service.dto.response.TimeCheckListDto.*;
 import static com.finalproject.seatudy.service.util.CalendarUtil.*;
-import static com.finalproject.seatudy.service.util.Formatter.sdtf;
-import static com.finalproject.seatudy.service.util.Formatter.stf;
-import static java.lang.String.format;
+import static com.finalproject.seatudy.service.util.Formatter.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -297,11 +294,23 @@ public class TimeCheckService {
             return checkOut;
         }
 
+        String strDate = date;
+        Date weekDate = sdf.parse(strDate);
+        weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
+        Calendar cal = Calendar.getInstance();
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+        cal.setTime(weekDate);
+
+        int week = cal.get(Calendar.WEEK_OF_YEAR);
+
+        week = (today.compareTo(setDay) < 0) ? week-1 : week;
+
         lastCheckIn.setCheckOut(nowTime);
         Rank rank = Rank.builder()
                 .dayStudy(dayStudy)
                 .totalStudy(total)
                 .date(setToday)
+                .week(week)
                 .member(member)
                 .timeChecks(findCheckIns)
                 .build();
@@ -348,55 +357,5 @@ public class TimeCheckService {
             return dayStudy;
         }
         return stf.format(today.getTime());
-    }
-
-    @Scheduled(cron = " 0 0 5 * * 1 ")
-    public void weekStudy() throws ParseException {
-        log.info("일주일 공부시간 저장 시작");
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
-
-        List<Member> members = memberRepository.findAll();
-        for (Member member : members){
-            List<Rank> ranks = rankRepository.findAllByMember(member);
-            if (ranks.size() == 0){
-                continue;
-            }
-            String weekStudy =  ranks.get(ranks.size()-1).getTotalStudy();
-
-            List<WeekRank> weekRanks = weekRankRepository.findAllByMember(member);
-            if (weekRanks.size() == 0) {
-                WeekRank firstWeekRank = WeekRank.builder()
-                        .weekStudy(weekStudy)
-                        .totalStudy(weekStudy)
-                        .date(date)
-                        .member(member)
-                        .build();
-                weekRankRepository.save(firstWeekRank);
-                continue;
-            }
-
-            List<Rank> allMemberList = rankRepository.findAllByMember(member);
-
-            String totalTime = totalTime(allMemberList);
-            Date totalStudyTime = stf.parse(totalTime);
-
-            WeekRank weeksStudy = weekRanks.get(weekRanks.size()-1);
-            String weekTime = weeksStudy.getTotalStudy();
-            Date weekStudyTime = stf.parse(weekTime);
-
-            long second = (totalStudyTime.getTime() - weekStudyTime.getTime()) / 1000;
-            long minute = second / 60;
-            long hour = minute / 60;
-
-            String weekStudyFormat = String.format("%02d:%02d:%02d",hour,minute,second);
-                WeekRank afterWeekRank =  WeekRank.builder()
-                        .weekStudy(weekStudyFormat)
-                        .totalStudy(totalTime)
-                        .date(date)
-                        .member(member)
-                        .build();
-                weekRankRepository.save(afterWeekRank);
-        }
-
     }
 }
