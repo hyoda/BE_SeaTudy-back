@@ -56,6 +56,7 @@ public class MemberService {
                         .id(findMember.getMemberId())
                         .email(findMember.getEmail())
                         .nickname(findMember.getNickname())
+                        .defaultFish(findMember.getDefaultFishUrl())
                         .loginType(findMember.getLoginType())
                         .point(findMember.getPoint())
                         .build()
@@ -88,15 +89,16 @@ public class MemberService {
     @Transactional
     public Member registerSocialLoginMemberIfNeed(MemberResDto memberResDto, LoginType loginType) {
         String email = memberResDto.getEmail();
-        String name = memberResDto.getNickname();
         Member member = memberRepository.findByEmail(email).orElse(null);
+
+        int randNum = (int) (Math.random() * 10000);
 
         if(member == null) {
             String password = UUID.randomUUID().toString();
 
             member = Member.builder()
                     .email(email)
-                    .nickname(name)
+                    .nickname("Player" + randNum)
                     .password(passwordEncoder.encode(password))
                     .loginType(loginType)
                     .defaultFishUrl(fishRepository.findByFishId(1L).getFishImageUrl())
