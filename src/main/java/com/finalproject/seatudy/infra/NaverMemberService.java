@@ -80,7 +80,7 @@ public class NaverMemberService {
     }
 
     private MemberOauthResDto getNaverUserInfo(String naverACTokens) throws JsonProcessingException {
-        JsonNode jsonNode = MemberService.getUserInfo(naverACTokens, NAVER_USER_INFO);
+        JsonNode jsonNode = MemberService.getUserInfo(naverACTokens, NAVER_USER_INFO).get("response");
         String email = jsonNode.get("email").asText();
         log.info("Naver 유저이메일: {}", email);
         return new MemberOauthResDto(email);
