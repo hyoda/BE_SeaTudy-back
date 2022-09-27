@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.domain.LoginType;
 import com.finalproject.seatudy.domain.entity.Member;
-import com.finalproject.seatudy.domain.entity.Rank;
-import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.security.jwt.JwtTokenUtils;
 import com.finalproject.seatudy.service.MemberService;
 import com.finalproject.seatudy.service.dto.response.MemberResDto;
+import com.finalproject.seatudy.service.dto.response.MemberResDto.MemberOauthResDto;
 import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +23,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-
-import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
 
 
 @Slf4j
@@ -35,36 +31,26 @@ import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
 public class KaKaoMemberService {
     private final MemberService memberService;
     private final JwtTokenUtils jwtTokenUtils;
-    private final RankRepository rankRepository;
 
     @Value("${security.oauth2.kakao.client_id}")
     private String KAKAO_CLIENT_ID;
     @Value("${security.oauth2.kakao.redirect_uri}")
     private String KAKAO_REDIRECT_URI;
-
+    @Value("${security.oauth2.kakao.userinfo_uri}")
+    private String KAKAO_USER_INFO;
 
     public ResponseDto<?> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         String kakaoACTokens = getKakaoTokens(code);
-        MemberResDto kakaoUserInfo = getKakaoUserInfo(kakaoACTokens);
+        MemberOauthResDto kakaoUserInfo = getKakaoUserInfo(kakaoACTokens);
         Member kakaoMember = memberService.registerSocialLoginMemberIfNeed(kakaoUserInfo, LoginType.KAKAO);
+
         String kakaoAC = jwtTokenUtils.generateJwtToken(kakaoMember);
         memberService.tokenToHeaders(kakaoAC, response);
 
-        List<Rank> allMemberList = rankRepository.findAllByMember(kakaoMember);
-        Long point = totalPoint(allMemberList);
-
+        Long point = memberService.calculateCurrentPoint(kakaoMember);
         log.info("kakao 로그인 완료: {}",kakaoMember.getEmail());
-        return ResponseDto.success(
-                MemberResDto.builder()
-                        .id(kakaoMember.getMemberId())
-                        .email(kakaoMember.getEmail())
-                        .nickname(kakaoMember.getNickname())
-                        .defaultFish(kakaoMember.getDefaultFishUrl())
-                        .loginType(LoginType.KAKAO)
-                        .point(point)
-                        .build());
+        return ResponseDto.success(MemberResDto.fromEntity(kakaoMember, point));
     }
-
 
     public String getKakaoTokens(String code) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
@@ -80,9 +66,7 @@ public class KaKaoMemberService {
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
                 "https://kauth.kakao.com/oauth/token",
-                HttpMethod.POST,
-                kakaoTokenRequest,
-                String.class);
+                HttpMethod.POST, kakaoTokenRequest, String.class);
 
         String responseBody = response.getBody(); // json 형태
         ObjectMapper objectMapper = new ObjectMapper();
@@ -92,30 +76,10 @@ public class KaKaoMemberService {
         return jsonNode.get("access_token").asText();
     }
 
-    public MemberResDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "Content-Type: application/json;charset=UTF-8");
-
-
-        HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest =
-                new HttpEntity<>(headers);
-        RestTemplate rt = new RestTemplate();
-        ResponseEntity<String> response = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.GET, kakaoUserInfoRequest, String.class);
-
-        String responseBody = response.getBody();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-
-        long userId = jsonNode.get("id").asLong();
+    public MemberOauthResDto getKakaoUserInfo(String kakaoACTokens) throws JsonProcessingException {
+        JsonNode jsonNode = MemberService.getUserInfo(kakaoACTokens, KAKAO_USER_INFO);
         String email = jsonNode.get("kakao_account").get("email").asText();
-
-        log.info("Kakao에서 사용자 정보획득 완료: {}", email);
-        return MemberResDto.builder()
-                .id(userId)
-                .email(email)
-                .build();
+        log.info("Kakao 유저이메일: {}", email);
+        return new MemberOauthResDto(email);
     }
 }
