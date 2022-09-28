@@ -50,7 +50,11 @@ public enum ErrorCode {
     CHECKOUT_NOT_TRY(HttpStatus.BAD_REQUEST, "연속으로 체크인을 할 수 없습니다."),
     CHECKIN_NOT_TRY(HttpStatus.BAD_REQUEST,"연속으로 체크아웃을 할 수 없습니다."),
     // Chat Error
-    EMPTY_MESSAGE(HttpStatus.BAD_REQUEST, "메시지를 입력해주세요");
+    EMPTY_MESSAGE(HttpStatus.BAD_REQUEST, "메시지를 입력해주세요"),
+
+    // Fish_Location Error
+    DUPLICATE_FISH(HttpStatus.CONFLICT, "동일한 물고기가 존재합니다."),
+    FISH_NOT_FOUND(HttpStatus.BAD_REQUEST, "없는 물고기 입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
