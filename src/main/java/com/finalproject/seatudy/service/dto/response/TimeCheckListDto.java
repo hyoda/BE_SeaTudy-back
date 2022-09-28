@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.service.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,26 +9,33 @@ import java.util.List;
 public class TimeCheckListDto {
     @Builder
     @Getter
+    @AllArgsConstructor
     public static class CheckIn{
         private String checkIn;
         private String timeWatch;
-        private int HH;
-        private int mm;
-        private int ss;
+        private TimeDetail timeDetail;
     }
     @Builder
     @Getter
+    @AllArgsConstructor
     public static class CheckOut{
         private String checkOut;
         private String timeWatch;
-        private int HH;
-        private int mm;
-        private int ss;
-//        private TodayLogDto todayLogDto;
+        private TimeDetail timeDetail;
     }
 
     @Builder
     @Getter
+    @AllArgsConstructor
+    public static class TimeDetail {
+        private int hour;
+        private int minute;
+        private int second;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
     public static class TimeCheckDto {
         private String dayStudyTime;
         private String totalStudyTime;
@@ -36,6 +44,7 @@ public class TimeCheckListDto {
     }
     @Builder
     @Getter
+    @AllArgsConstructor
     public static class TodayLogDto {
         private String checkIn;
         private String checkOut;

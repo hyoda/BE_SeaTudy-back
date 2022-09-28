@@ -39,25 +39,13 @@ public class TimeCheckService {
 
         Member member = userDetails.getMember();
 
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
-
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
-        }
-
+        Calendar today = getToday();
         String setToday = dateFormat(today); //날짜 형식에 맞게 String형태로 포맷
 
         List<TimeCheck> timeChecks = timeCheckRepository.findByMemberAndDate(member,setToday);
         Optional<Rank> rank = rankRepository.findByMemberAndDate(member, setToday);
 
-        //체크아웃을 하지 않은 상태에서 체크인을 시도할 경우 NPE
+        //체크아웃을 하지 않은 상태에서 체크인을 시도할 경우
         for (TimeCheck timeCheck : timeChecks) {
             if (timeCheck.getCheckOut() == null) {
                 throw new CustomException(CHECKOUT_NOT_TRY);
@@ -80,42 +68,18 @@ public class TimeCheckService {
 
         log.info("체크인 {}", timeWatch);
 
-        String[] timeStamp = timeWatch.split(":"); //시, 분, 초 나누기
+        TimeDetail timeDetail = getTimeDetail(timeWatch);
 
-        int HH = Integer.parseInt(timeStamp[0]); //시
-        int mm = Integer.parseInt(timeStamp[1]); //분
-        int ss = Integer.parseInt(timeStamp[2]); //초
-
-
-        CheckIn checkIn = CheckIn.builder()
-                .checkIn(nowTime)
-                .timeWatch(timeWatch)
-                .HH(HH)
-                .mm(mm)
-                .ss(ss)
-                .build();
+        CheckIn checkIn = new CheckIn(nowTime, timeWatch, timeDetail);
 
         return checkIn;
-//        return timeWatch;
     }
 
     public TimeCheckDto getCheckIn(UserDetailsImpl userDetails) throws ParseException {
 
         Member member = userDetails.getMember();
 
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
-
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 인자보다 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
-        }
-
+        Calendar today = getToday();
         String setToday = dateFormat(today);
 
         Optional<Rank> rank = rankRepository.findByMemberAndDate(member, setToday);
@@ -130,12 +94,7 @@ public class TimeCheckService {
 
             String total = totalTime(allMemberList);
 
-            TimeCheckDto timeCheckDto = TimeCheckDto.builder()
-                    .dayStudyTime("00:00:00")
-                    .totalStudyTime(total)
-                    .isStudy(false)
-                    .todayLogs(todayLogDtos)
-                    .build();
+            TimeCheckDto timeCheckDto = new TimeCheckDto("00:00:00", total, false, todayLogDtos);
 
             log.info("체크인 기록이 없음 {}", timeCheckDto);
 
@@ -165,34 +124,21 @@ public class TimeCheckService {
         String total = totalTime(allMemberList);
 
         for (TimeCheck check : findCheckIn){
-            TodayLogDto todayLogDto = TodayLogDto.builder()
-                    .checkIn(check.getCheckIn())
-                    .checkOut(check.getCheckOut())
-                    .build();
+            TodayLogDto todayLogDto =  new TodayLogDto(check.getCheckIn(), check.getCheckOut());
             todayLogDtos.add(todayLogDto);
         }
 
         //체크인, 체크아웃 기록된 세트가 1회 이상 있는 경우
         if (findCheckIn.get(findCheckIn.size() - 1).getCheckOut() != null){
             String todayStudy = rank.get().getDayStudy();
-            TimeCheckDto timeCheckDto = TimeCheckDto.builder()
-                    .dayStudyTime(todayStudy)
-                    .totalStudyTime(total)
-                    .isStudy(false)
-                    .todayLogs(todayLogDtos)
-                    .build();
+            TimeCheckDto timeCheckDto = new TimeCheckDto(todayStudy, total, false, todayLogDtos);
 
             log.info("체크인 기록이 1회 이상 있음 {}", timeCheckDto);
             return timeCheckDto;
         }
 
         // 현재시간 + 누적시간
-        TimeCheckDto timeCheckDto = TimeCheckDto.builder()
-                .dayStudyTime(dayStudyTime)
-                .totalStudyTime(total)
-                .isStudy(true)
-                .todayLogs(todayLogDtos)
-                .build();
+        TimeCheckDto timeCheckDto = new TimeCheckDto(dayStudyTime, total, true, todayLogDtos);
 
         log.info("체크인 기록이 1회 이상 있음 {}", timeCheckDto);
         return timeCheckDto;
@@ -203,19 +149,7 @@ public class TimeCheckService {
 
         Member member = userDetails.getMember();
 
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
-
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 인자보다 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
-        }
-
+        Calendar today = getToday();
         String setToday = dateFormat(today); //날짜 형식에 맞게 String형태로 포맷
 
         List<TimeCheck> findCheckIns = timeCheckRepository.findByMemberAndDate(member, setToday);
@@ -270,19 +204,9 @@ public class TimeCheckService {
 
             log.info("체크아웃 {}", total);
 
-            String[] timeStamp = dayStudy.split(":"); //시, 분, 초 나누기
+            TimeDetail timeDetail = getTimeDetail(dayStudy);
 
-            int HH = Integer.parseInt(timeStamp[0]); //시
-            int mm = Integer.parseInt(timeStamp[1]); //분
-            int ss = Integer.parseInt(timeStamp[2]); //초
-
-            CheckOut checkOut = CheckOut.builder()
-                    .checkOut(nowTime)
-                    .timeWatch(dayStudy)
-                    .HH(HH)
-                    .mm(mm)
-                    .ss(ss)
-                    .build();
+            CheckOut checkOut = new CheckOut(nowTime, dayStudy, timeDetail);
 
             return checkOut;
         }
@@ -311,19 +235,9 @@ public class TimeCheckService {
         lastCheckIn.setRank(rank);
         rankRepository.save(rank);
 
-        String[] timeStamp = dayStudy.split(":"); //시, 분, 초 나누기
+        TimeDetail timeDetail = getTimeDetail(dayStudy);
 
-        int HH = Integer.parseInt(timeStamp[0]); //시
-        int mm = Integer.parseInt(timeStamp[1]); //분
-        int ss = Integer.parseInt(timeStamp[2]); //초
-
-        CheckOut checkOut = CheckOut.builder()
-                .checkOut(nowTime)
-                .timeWatch(dayStudy)
-                .HH(HH)
-                .mm(mm)
-                .ss(ss)
-                .build();
+        CheckOut checkOut = new CheckOut(nowTime, dayStudy, timeDetail);
 
         return checkOut;
     }
@@ -351,5 +265,33 @@ public class TimeCheckService {
             return dayStudy;
         }
         return stf.format(today.getTime());
+    }
+
+    private Calendar getToday() throws ParseException {
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
+
+        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
+        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+
+        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
+        todayCalendarTime(today); // yyyy-MM-dd HH:mm:ss 현재시간
+
+        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
+        if (today.compareTo(setDay) < 0) {
+            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
+        }
+        return today;
+    }
+
+    private TimeDetail getTimeDetail(String time) {
+        String[] timeStamp = time.split(":"); //시, 분, 초 나누기
+
+        int HH = Integer.parseInt(timeStamp[0]); //시
+        int mm = Integer.parseInt(timeStamp[1]); //분
+        int ss = Integer.parseInt(timeStamp[2]); //초
+
+        TimeDetail timeDetail = new TimeDetail(HH, mm, ss);
+
+        return timeDetail;
     }
 }

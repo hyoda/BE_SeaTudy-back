@@ -35,16 +35,7 @@ public class RankService {
     public ResponseDto<?> getDayRank() throws ParseException {
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1).toString();
 
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
-        }
+        Calendar today = getToday(date);
         String setToday = dateFormat(today);
 
         List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
@@ -56,24 +47,10 @@ public class RankService {
     public ResponseDto<?> getWeekDayRank() throws ParseException {
         String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
 
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
-        }
+        Calendar today = getToday(date);
         String setToday = dateFormat(today);
 
-        String strDate = setToday;
-        Date weekDate = sdf.parse(strDate);
-        weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(weekDate);
+        Calendar cal = setWeekDate(setToday);
 
         int year = cal.get(Calendar.YEAR);
         int week = cal.get(Calendar.WEEK_OF_YEAR)-2;
@@ -101,7 +78,7 @@ public class RankService {
         return ResponseDto.success(responseDtos);
     }
 
-    public ResponseDto<?> getWeekStudy(UserDetailsImpl userDetails) {
+    public ResponseDto<?> getAllWeekStudy(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
 
         List<WeekStudyResponseDto> responseDtos = new ArrayList<>();
@@ -121,12 +98,7 @@ public class RankService {
 
         Member member = userDetails.getMember();
 
-        String strDate = date;
-        Date weekDate = sdf.parse(strDate);
-        weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(weekDate);
+        Calendar cal = setWeekDate(date);
 
         int week = cal.get(Calendar.WEEK_OF_YEAR)-1;
         String[] weekDays = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
@@ -155,11 +127,7 @@ public class RankService {
     public void weekStudy() throws ParseException {
         log.info("일주일 공부시간 저장 시작");
         String strDate = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
-        Date date = sdf.parse(strDate);
-        date = new Date(date.getTime() + (1000 * 60 * 60 * 24 - 1));
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(date);
+        Calendar cal = setWeekDate(strDate);
 
         int year = cal.get(Calendar.YEAR);
         int week = cal.get(Calendar.WEEK_OF_YEAR) - 1;
@@ -209,6 +177,30 @@ public class RankService {
             weekRankRepository.save(afterWeekRank);
         }
 
+    }
+
+    private Calendar setWeekDate(String date) throws ParseException {
+        String strDate = date;
+        Date weekDate = sdf.parse(strDate);
+        weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
+        Calendar cal = Calendar.getInstance();
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+        cal.setTime(weekDate);
+        return cal;
+    }
+
+    private Calendar getToday(String date) throws ParseException {
+        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
+        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+
+        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
+        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
+
+        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
+        if (today.compareTo(setDay) < 0) {
+            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
+        }
+        return today;
     }
 
 }
