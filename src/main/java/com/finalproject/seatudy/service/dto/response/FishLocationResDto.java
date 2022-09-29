@@ -1,6 +1,6 @@
 package com.finalproject.seatudy.service.dto.response;
 
-import com.finalproject.seatudy.domain.entity.FishLocation;
+import com.finalproject.seatudy.domain.entity.MemberFish;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class FishLocationResDto {
-    private int fishNum;
-    private int leftValue;
-    private int topValue;
+    private Long fishNum;
+    private int left;
+    private int top;
 
-    public static FishLocationResDto fromEntity(FishLocation fishLocation){
+    public static FishLocationResDto fromEntity(MemberFish memberFish){
         return new FishLocationResDto(
-                fishLocation.getFishNum(),
-                fishLocation.getLeftValue(),
-                fishLocation.getTopValue()
+                memberFish.getFish().getFishId()-1,
+                memberFish.getLeftValue(),
+                memberFish.getTopValue()
         );
     }
 }

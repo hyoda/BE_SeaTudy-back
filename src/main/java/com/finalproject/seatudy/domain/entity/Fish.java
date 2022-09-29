@@ -15,6 +15,7 @@ public class Fish {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fishId;
     private String fishName;
+    private int fishPoint;
     private String fishImageUrl;
     @Lob
     private String fishInfo;

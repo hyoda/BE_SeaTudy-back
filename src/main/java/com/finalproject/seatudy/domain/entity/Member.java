@@ -38,6 +38,10 @@ public class Member extends TimeStamped {
     @Column
     private int point;
 
+    public void updatePoint(int point) {
+        this.point = point;
+    }
+
     public void updateNickname(NicknameReqDto nicknameReqDto) {
         this.nickname = nicknameReqDto.getNickname();
     }

@@ -16,12 +16,6 @@ public class FishLocationController {
 
     private final FishLocationService fishLocationService;
 
-    @PostMapping("/fishes/locations")
-    public ResponseDto<?> createFishLocation(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                             @RequestBody FishLocationReqDto fishLocationReqDto) {
-        return fishLocationService.createFishLocation(userDetails, fishLocationReqDto);
-    }
-
     @GetMapping("/fishes/locations")
     public ResponseDto<?> getFishLocations(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
@@ -32,5 +26,11 @@ public class FishLocationController {
     public ResponseDto<?> updateFishLocation(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                              @RequestBody FishLocationReqDto fishLocationReqDto) {
         return fishLocationService.updateFishLocation(userDetails, fishLocationReqDto);
+    }
+
+    @PutMapping("/fishes/relocation/{fishNum}")
+    public ResponseDto<?> resetFishLocation(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                            @PathVariable Long fishNum) {
+        return fishLocationService.resetFishLocation(userDetails, fishNum);
     }
 }
