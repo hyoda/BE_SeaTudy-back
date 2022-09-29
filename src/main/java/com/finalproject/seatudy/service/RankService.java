@@ -123,7 +123,7 @@ public class RankService {
 
     }
 
-    @Scheduled(cron = " 50 59 4 * * 1 ")
+    @Scheduled(cron = " 30 06 13 * * * ")
     public void weekStudy() throws ParseException {
         log.info("일주일 공부시간 저장 시작");
         String strDate = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
