@@ -65,7 +65,7 @@ public class CalendarUtil {
 //        return totalSumTime;
     }
 
-    public static Long totalPoint(List<Rank> allUserList) {
+    public static int totalPoint(List<Rank> allUserList) {
         long total = 0L; //총 누적 공부시간이 담김
 
         for (Rank find : allUserList) {
@@ -76,9 +76,9 @@ public class CalendarUtil {
             int alltotal = allSS + Integer.parseInt(arrayFind[2]); //초으로 환산
             total += alltotal;
         }
-            Long totalHH = (total / 3600);
+            int totalHH = (int)(total / 3600);
 
-            return totalHH;
+        return totalHH;
     }
 
 

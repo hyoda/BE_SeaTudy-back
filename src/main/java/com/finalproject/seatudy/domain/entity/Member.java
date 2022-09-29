@@ -36,7 +36,7 @@ public class Member extends TimeStamped {
     private LoginType loginType;
 
     @Column
-    private Long point;
+    private int point;
 
     public void updateNickname(NicknameReqDto nicknameReqDto) {
         this.nickname = nicknameReqDto.getNickname();

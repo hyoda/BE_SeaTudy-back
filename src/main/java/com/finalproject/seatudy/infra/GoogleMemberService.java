@@ -49,7 +49,7 @@ public class GoogleMemberService {
         String googleAC = jwtTokenUtils.generateJwtToken(googleMember);
         memberService.tokenToHeaders(googleAC, response);
 
-        Long point = memberService.calculateCurrentPoint(googleMember);
+        int point = memberService.calculateCurrentPoint(googleMember);
         log.info("Google 로그인 완료: {}",googleMember.getEmail());
         return ResponseDto.success(MemberResDto.fromEntity(googleMember, point));
     }
