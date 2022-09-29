@@ -23,10 +23,22 @@ public class RankController {
         return rankService.getDayRank();
     }
 
+    @GetMapping("/dayMyRanks")
+    @ApiOperation(value = "일일 My 랭킹 조회")
+    public ResponseDto<?> getMyDayRank(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
+        return rankService.getMyDayRank(userDetails);
+    }
+
     @GetMapping("/weekDayRanks")
     @ApiOperation(value = "주간 랭킹 조회")
     public ResponseDto<?> getWeekDayRank() throws ParseException {
         return rankService.getWeekDayRank();
+    }
+
+    @GetMapping("/weekMyDayRanks")
+    @ApiOperation(value = "주간 My 랭킹 조회")
+    public ResponseDto<?> getMyWeekDayRank(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
+        return rankService.getMyWeekDayRank(userDetails);
     }
 
     @GetMapping("/dayStudies")

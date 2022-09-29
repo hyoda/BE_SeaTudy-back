@@ -24,7 +24,8 @@ import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKIN_NOT_
 import static com.finalproject.seatudy.security.exception.ErrorCode.CHECKOUT_NOT_TRY;
 import static com.finalproject.seatudy.service.dto.response.TimeCheckListDto.*;
 import static com.finalproject.seatudy.service.util.CalendarUtil.*;
-import static com.finalproject.seatudy.service.util.Formatter.*;
+import static com.finalproject.seatudy.service.util.Formatter.sdtf;
+import static com.finalproject.seatudy.service.util.Formatter.stf;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class TimeCheckService {
 
     private final TimeCheckRepository timeCheckRepository;
     private final RankRepository rankRepository;
+    private final RankService rankService;
 
     @Transactional
     public CheckIn checkIn(UserDetailsImpl userDetails) throws ParseException {
@@ -96,7 +98,7 @@ public class TimeCheckService {
 
             TimeCheckDto timeCheckDto = new TimeCheckDto("00:00:00", total, false, todayLogDtos);
 
-            log.info("체크인 기록이 없음 {}", timeCheckDto);
+            log.info("체크인 기록이 없음 {}", member.getEmail());
 
             return timeCheckDto;
         }
@@ -133,14 +135,14 @@ public class TimeCheckService {
             String todayStudy = rank.get().getDayStudy();
             TimeCheckDto timeCheckDto = new TimeCheckDto(todayStudy, total, false, todayLogDtos);
 
-            log.info("체크인 기록이 1회 이상 있음 {}", timeCheckDto);
+            log.info("체크인 기록이 1회 이상 있음 {}", member.getEmail());
             return timeCheckDto;
         }
 
         // 현재시간 + 누적시간
         TimeCheckDto timeCheckDto = new TimeCheckDto(dayStudyTime, total, true, todayLogDtos);
 
-        log.info("체크인 기록이 1회 이상 있음 {}", timeCheckDto);
+        log.info("체크인 기록이 1회 이상 있음 {}", member.getEmail());
         return timeCheckDto;
     }
 
@@ -211,12 +213,7 @@ public class TimeCheckService {
             return checkOut;
         }
 
-        String strDate = setToday;
-        Date weekDate = sdf.parse(strDate);
-        weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
-        Calendar cal = Calendar.getInstance();
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.setTime(weekDate);
+        Calendar cal = rankService.setWeekDate(setToday);
 
         int week = cal.get(Calendar.WEEK_OF_YEAR)-1;
         if (week == 0){

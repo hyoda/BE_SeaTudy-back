@@ -33,9 +33,9 @@ public class RankService {
     private final MemberRepository memberRepository;
 
     public ResponseDto<?> getDayRank() throws ParseException {
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1).toString();
 
-        Calendar today = getToday(date);
+        Calendar today = getToday();
+        today.add(Calendar.DATE, -1);
         String setToday = dateFormat(today);
 
         List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
@@ -44,10 +44,30 @@ public class RankService {
                 .collect(Collectors.toList()));
     }
 
-    public ResponseDto<?> getWeekDayRank() throws ParseException {
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
+    public ResponseDto<?> getMyDayRank(UserDetailsImpl userDetails) throws ParseException {
+        Member member = userDetails.getMember();
 
-        Calendar today = getToday(date);
+        Calendar today = getToday();
+        today.add(Calendar.DATE, -1);
+        String setToday = dateFormat(today);
+
+        List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
+        int myRank = 0;
+        for (int i=0; i<dayStudyRanks.size(); i++)
+            if(Objects.equals(dayStudyRanks.get(i).getMember().getNickname(), member.getNickname())) {
+                Rank rank = dayStudyRanks.get(i);
+                if (dayStudyRanks.contains(rank)) {
+                    myRank = dayStudyRanks.indexOf(rank)+1;
+                }
+            }
+        MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), myRank);
+
+        return ResponseDto.success(responseDto);
+    }
+
+    public ResponseDto<?> getWeekDayRank() throws ParseException {
+
+        Calendar today = getToday();
         String setToday = dateFormat(today);
 
         Calendar cal = setWeekDate(setToday);
@@ -63,6 +83,35 @@ public class RankService {
 
         return ResponseDto.success(weekDayStudyRanks.stream().map(WeekRankResponseDto::fromEntity)
                 .collect(Collectors.toList()));
+    }
+
+    public ResponseDto<?> getMyWeekDayRank(UserDetailsImpl userDetails) throws ParseException {
+        Member member = userDetails.getMember();
+
+        Calendar today = getToday();
+        String setToday = dateFormat(today);
+
+        Calendar cal = setWeekDate(setToday);
+
+        int year = cal.get(Calendar.YEAR);
+        int week = cal.get(Calendar.WEEK_OF_YEAR)-2;
+        if (week <= 0) {
+            year -= 1;
+            week = 52;
+        }
+
+        List<WeekRank> weekDayStudyRanks = weekRankRepository.findTop20ByYearAndWeekOrderByWeekStudyDesc(year,week);
+        int myRank = 0;
+        for (int i=0; i<weekDayStudyRanks.size(); i++)
+            if(Objects.equals(weekDayStudyRanks.get(i).getMember().getNickname(), member.getNickname())) {
+                    WeekRank weekRank = weekDayStudyRanks.get(i);
+                if (weekDayStudyRanks.contains(weekRank)) {
+                    myRank = weekDayStudyRanks.indexOf(weekRank)+1;
+                }
+            }
+        MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), myRank);
+
+        return ResponseDto.success(responseDto);
     }
 
     public ResponseDto<?> getAllDayStudyByYear(String year, UserDetailsImpl userDetails) {
@@ -179,7 +228,7 @@ public class RankService {
 
     }
 
-    private Calendar setWeekDate(String date) throws ParseException {
+    public Calendar setWeekDate(String date) throws ParseException {
         String strDate = date;
         Date weekDate = sdf.parse(strDate);
         weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
@@ -189,7 +238,9 @@ public class RankService {
         return cal;
     }
 
-    private Calendar getToday(String date) throws ParseException {
+    private Calendar getToday() throws ParseException {
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
+
         Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
         setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
 
