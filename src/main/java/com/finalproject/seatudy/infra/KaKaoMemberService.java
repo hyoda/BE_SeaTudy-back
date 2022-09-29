@@ -47,7 +47,7 @@ public class KaKaoMemberService {
         String kakaoAC = jwtTokenUtils.generateJwtToken(kakaoMember);
         memberService.tokenToHeaders(kakaoAC, response);
 
-        Long point = memberService.calculateCurrentPoint(kakaoMember);
+        int point = memberService.calculateCurrentPoint(kakaoMember);
         log.info("kakao 로그인 완료: {}",kakaoMember.getEmail());
         return ResponseDto.success(MemberResDto.fromEntity(kakaoMember, point));
     }

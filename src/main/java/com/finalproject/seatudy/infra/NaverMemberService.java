@@ -49,7 +49,7 @@ public class NaverMemberService {
         String naverAC = jwtTokenUtils.generateJwtToken(naverMember);
         memberService.tokenToHeaders(naverAC, response);
 
-        Long point = memberService.calculateCurrentPoint(naverMember);
+        int point = memberService.calculateCurrentPoint(naverMember);
         log.info("Naver 로그인 완료: {}", naverMember.getEmail());
         return ResponseDto.success(fromEntity(naverMember, point));
     }

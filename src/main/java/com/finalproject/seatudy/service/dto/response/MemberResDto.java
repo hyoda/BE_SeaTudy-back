@@ -16,9 +16,9 @@ public class MemberResDto {
     private String nickname;
     private String defaultFish;
     private LoginType loginType;
-    private Long point;
+    private int point;
 
-    public static MemberResDto fromEntity(Member member, Long point) {
+    public static MemberResDto fromEntity(Member member, int point) {
         return new MemberResDto(
                 member.getMemberId(),
                 member.getEmail(),

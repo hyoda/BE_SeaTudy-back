@@ -121,7 +121,7 @@ public class MemberService {
                     .password(passwordEncoder.encode(password))
                     .loginType(loginType)
                     .defaultFishUrl(fishRepository.findByFishId(1L).getFishImageUrl())
-                    .point(0L)
+                    .point(0)
                     .build();
 
             memberRepository.save(member);
@@ -139,7 +139,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-        Long point = calculateCurrentPoint(member);
+        int point = calculateCurrentPoint(member);
         return ResponseDto.success(fromEntity(member, point));
     }
 
@@ -158,12 +158,8 @@ public class MemberService {
     }
 
     public ResponseDto<?> getFishImage(String fishName) {
-        Fish fishInfo = getFishByName(fishName);
-        return ResponseDto.success(FishInfoResDto.builder()
-                .fishNum(fishInfo.getFishId())
-                .fishName(fishInfo.getFishName())
-                .fishImageUrl(fishInfo.getFishImageUrl())
-                .build());
+        Fish fish = getFishByName(fishName);
+        return ResponseDto.success(FishInfoResDto.fromEntity(fish));
     }
 
     private Fish getFishByName(String fishName) {
@@ -171,7 +167,7 @@ public class MemberService {
         return fishRepository.findByFishName(decodeFishNameToKr);
     }
 
-    public Long calculateCurrentPoint(Member member) {
+    public int calculateCurrentPoint(Member member) {
         List<Rank> allMemberList = rankRepository.findAllByMember(member);
         return totalPoint(allMemberList);
     }
