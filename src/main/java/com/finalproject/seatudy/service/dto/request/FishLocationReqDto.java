@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class FishLocationReqDto {
-    private int fishNum;
-    private int leftValue;
-    private int topValue;
+    private Long fishNum;
+    private int left;
+    private int top;
 }

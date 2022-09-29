@@ -9,25 +9,33 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Builder
-public class FishLocation {
+@NoArgsConstructor
+@AllArgsConstructor
+public class MemberFish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fishLocationId;
-    private int leftValue;
-    private int topValue;
-    private int fishNum;
+    private Long memberFishId;
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    @ManyToOne
+    @JoinColumn(name = "FISH_ID")
+    private Fish fish;
+    private int leftValue = 0;
+    private int topValue = 0;
+
     public void update(FishLocationReqDto fishLocationReqDto){
-        this.leftValue = fishLocationReqDto.getLeftValue();
-        this.topValue = fishLocationReqDto.getTopValue();
+        this.leftValue = fishLocationReqDto.getLeft();
+        this.topValue = fishLocationReqDto.getTop();
+    }
+
+    public void resetLocation() {
+        this.leftValue = 0;
+        this.topValue = 0;
     }
 
 }

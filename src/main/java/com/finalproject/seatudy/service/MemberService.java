@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.seatudy.domain.LoginType;
 import com.finalproject.seatudy.domain.entity.Fish;
 import com.finalproject.seatudy.domain.entity.Member;
+import com.finalproject.seatudy.domain.entity.MemberFish;
 import com.finalproject.seatudy.domain.entity.Rank;
 import com.finalproject.seatudy.domain.repository.FishRepository;
+import com.finalproject.seatudy.domain.repository.MemberFishRepository;
 import com.finalproject.seatudy.domain.repository.MemberRepository;
 import com.finalproject.seatudy.domain.repository.RankRepository;
 import com.finalproject.seatudy.security.UserDetailsImpl;
@@ -49,6 +51,7 @@ public class MemberService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RankRepository rankRepository;
     private final FishRepository fishRepository;
+    private final MemberFishRepository memberFishRepository;
 
     @Transactional
     public ResponseDto<?> updateNickname(UserDetailsImpl userDetails, NicknameReqDto nicknameReqDto) {
@@ -135,11 +138,23 @@ public class MemberService {
         response.addHeader("Authorization", "Bearer " + token);
     }
 
+    // 현재 total point 업데이트 및 unlock 물고기 업데이트해줌
+    @Transactional
     public ResponseDto<?> getMyProfile(UserDetailsImpl userDetails) {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         int point = calculateCurrentPoint(member);
+        member.updatePoint(point);
+        List<Fish> unlockFishList = fishRepository.findAllByFishPointLessThanEqual(point);
+
+        for (Fish fish : unlockFishList) {
+            if(memberFishRepository.findByMemberAndFish_FishId(member, fish.getFishId()).isEmpty()) {
+                memberFishRepository.save(MemberFish.builder()
+                        .member(member)
+                        .fish(fish).build());
+            }
+        }
         return ResponseDto.success(fromEntity(member, point));
     }
 
