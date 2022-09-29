@@ -35,7 +35,7 @@ public class RankController {
         return rankService.getWeekDayRank();
     }
 
-    @GetMapping("/weekMyDayRanks")
+    @GetMapping("/weekDayMyRanks")
     @ApiOperation(value = "주간 My 랭킹 조회")
     public ResponseDto<?> getMyWeekDayRank(@AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
         return rankService.getMyWeekDayRank(userDetails);

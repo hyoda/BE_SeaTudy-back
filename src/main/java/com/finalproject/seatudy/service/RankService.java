@@ -52,14 +52,10 @@ public class RankService {
         String setToday = dateFormat(today);
 
         List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
-        int myRank = 0;
-        for (int i=0; i<dayStudyRanks.size(); i++)
-            if(Objects.equals(dayStudyRanks.get(i).getMember().getNickname(), member.getNickname())) {
-                Rank rank = dayStudyRanks.get(i);
-                if (dayStudyRanks.contains(rank)) {
-                    myRank = dayStudyRanks.indexOf(rank)+1;
-                }
-            }
+        Optional<Rank> rank = rankRepository.findByMemberAndDate(member, setToday);
+
+        int myRank = dayStudyRanks.indexOf(rank.get())+1;
+
         MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), myRank);
 
         return ResponseDto.success(responseDto);
@@ -101,14 +97,10 @@ public class RankService {
         }
 
         List<WeekRank> weekDayStudyRanks = weekRankRepository.findTop20ByYearAndWeekOrderByWeekStudyDesc(year,week);
-        int myRank = 0;
-        for (int i=0; i<weekDayStudyRanks.size(); i++)
-            if(Objects.equals(weekDayStudyRanks.get(i).getMember().getNickname(), member.getNickname())) {
-                    WeekRank weekRank = weekDayStudyRanks.get(i);
-                if (weekDayStudyRanks.contains(weekRank)) {
-                    myRank = weekDayStudyRanks.indexOf(weekRank)+1;
-                }
-            }
+        Optional<WeekRank> weekRank = weekRankRepository.findByMemberAndWeek(member, week);
+
+        int myRank = weekDayStudyRanks.indexOf(weekRank.get())+1;
+
         MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), myRank);
 
         return ResponseDto.success(responseDto);
