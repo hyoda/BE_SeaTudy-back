@@ -135,14 +135,14 @@ public class TimeCheckService {
             String todayStudy = rank.get().getDayStudy();
             TimeCheckDto timeCheckDto = new TimeCheckDto(todayStudy, total, false, todayLogDtos);
 
-            log.info("체크인 기록이 1회 이상 있음 {}", member.getEmail());
+            log.info("체크인 기록이 1회 이상 있음(timer stop) {}", member.getEmail());
             return timeCheckDto;
         }
 
         // 현재시간 + 누적시간
         TimeCheckDto timeCheckDto = new TimeCheckDto(dayStudyTime, total, true, todayLogDtos);
 
-        log.info("체크인 기록이 1회 이상 있음 {}", member.getEmail());
+        log.info("체크인 기록이 1회 이상 있음(timer continue) {}", member.getEmail());
         return timeCheckDto;
     }
 
@@ -183,15 +183,24 @@ public class TimeCheckService {
             lastCheckIn.setRank(findCheckIns.get(0).getRank());
 
             LocalTime dayStudyTime = LocalTime.parse(dayStudy);
+            int hh = dayStudyTime.getHour();
+            int mm = dayStudyTime.getMinute();
+            int ss = dayStudyTime.getSecond();
+            int dayStudySecond =  hh * 3600 + mm * 60 + ss; //초으로 환산
 
-            LocalTime totalStudyTime = LocalTime.parse(total);
+            String[] totalArrayFind = total.split(":");
+            int HH = Integer.parseInt(totalArrayFind[0]);
+            int MM = Integer.parseInt(totalArrayFind[1]);
+            int SS = Integer.parseInt(totalArrayFind[2]);
+            int totalSecond = HH * 3600 + MM * 60 + SS; //초으로 환산
 
-            long second = totalStudyTime.getSecond() + dayStudyTime.getSecond();
-            long minute = totalStudyTime.getMinute() + dayStudyTime.getMinute();
-            long hour = totalStudyTime.getHour() + dayStudyTime.getHour();
+            int totalTime = dayStudySecond + totalSecond;
 
-            String totalStudyFormat = String.format("%02d:%02d:%02d",hour,minute,second);
-            total = totalStudyFormat;
+            int second = ((totalTime % 3600) % 60);
+            int minute = ((totalTime % 3600) / 60);
+            int hour = (totalTime / 3600);
+
+            total = String.format("%02d:%02d:%02d",hour,minute,second);
         }
 
         //3
@@ -200,7 +209,6 @@ public class TimeCheckService {
             lastCheckIn.setRank(findCheckIns.get(0).getRank());
             findRank.get().setDayStudy(dayStudy);
             total = totalTime(allMemberList);
-            //            allMemberList.get(allMemberList.size()-1).setTotalStudy(total);
             findRank.get().setTotalStudy(total);
 
 
@@ -291,4 +299,5 @@ public class TimeCheckService {
 
         return timeDetail;
     }
+
 }
