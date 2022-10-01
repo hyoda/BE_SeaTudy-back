@@ -41,7 +41,7 @@ public class JwtDecoder {
         return decodedJWT.getSubject();
     }
 
-    public Member getMemberNickname(String token) {
+    public Member getMember(String token) {
         String accessToken = token.substring(7);
         String email = decodeUsername(accessToken);
 

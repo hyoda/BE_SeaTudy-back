@@ -25,12 +25,14 @@ public class ChatController {
 
     @MessageMapping(value = "/chat/message")
     public void message(ChatMessageDto message, @Header("Authorization") String token) {
-        Member member = jwtDecoder.getMemberNickname(token);
+        Member member = jwtDecoder.getMember(token);
 
         if(!message.getMessage().isEmpty() || message.getMessage() != null || !message.getMessage().equals("")) {
+            message.setType(ChatMessageDto.MessageType.TALK);
             message.setSender(member.getNickname());
-            log.info("사용자가 채팅방에 메시지전송 -- {}:{}",message.getSender(), message.getMessage());
+            message.setDefaultFish(member.getDefaultFishUrl());
             message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
+            log.info("사용자가 채팅방에 메시지전송 -- {}:{}",message.getSender(), message.getMessage());
             chatRoomService.sendChatMessage(message);
         } else throw new CustomException(ErrorCode.EMPTY_MESSAGE);
     }
