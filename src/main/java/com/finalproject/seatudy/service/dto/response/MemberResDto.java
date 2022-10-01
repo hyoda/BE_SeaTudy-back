@@ -35,4 +35,18 @@ public class MemberResDto {
     public static class MemberOauthResDto {
         private String email;
     }
+
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class MemberPageResDto {
+        private Long id;
+        private String email;
+        private String nickname;
+        private String defaultFish;
+        private int point;
+        private String totalStudy;
+    }
 }

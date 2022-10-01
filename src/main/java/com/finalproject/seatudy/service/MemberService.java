@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.finalproject.seatudy.service.dto.response.MemberResDto.MemberOauthResDto;
-import static com.finalproject.seatudy.service.dto.response.MemberResDto.fromEntity;
+import static com.finalproject.seatudy.service.dto.response.MemberResDto.*;
 import static com.finalproject.seatudy.service.util.CalendarUtil.totalPoint;
+import static com.finalproject.seatudy.service.util.CalendarUtil.totalTime;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -144,7 +144,10 @@ public class MemberService {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-        int point = calculateCurrentPoint(member);
+        List<Rank> allMemberList = rankRepository.findAllByMember(member);
+        int point = totalPoint(allMemberList);
+        String total = totalTime(allMemberList);
+
         member.updatePoint(point);
         List<Fish> unlockFishList = fishRepository.findAllByFishPointLessThanEqual(point);
 
@@ -155,7 +158,14 @@ public class MemberService {
                         .fish(fish).build());
             }
         }
-        return ResponseDto.success(fromEntity(member, point));
+        return ResponseDto.success(MemberPageResDto.builder()
+                .id(member.getMemberId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .defaultFish(member.getDefaultFishUrl())
+                .point(point)
+                .totalStudy(total)
+                .build());
     }
 
 
