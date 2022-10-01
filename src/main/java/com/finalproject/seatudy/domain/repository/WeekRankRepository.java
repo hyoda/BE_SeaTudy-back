@@ -12,4 +12,5 @@ public interface WeekRankRepository extends JpaRepository<WeekRank, Long> {
     List<WeekRank> findTop20ByYearAndWeekOrderByWeekStudyDesc(int year, int week);
     List<WeekRank> findTop4ByMemberOrderByWeekDesc(Member member);
     Optional<WeekRank> findByMemberAndWeek(Member member, int week);
+    List<WeekRank> findAllByYearAndWeekOrderByWeekStudyDesc(int year, int week);
 }
