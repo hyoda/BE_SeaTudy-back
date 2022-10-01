@@ -1,5 +1,6 @@
 package com.finalproject.seatudy.security;
 
+import com.finalproject.seatudy.domain.entity.Member;
 import com.finalproject.seatudy.domain.repository.ChatRoomRepository;
 import com.finalproject.seatudy.security.jwt.JwtDecoder;
 import com.finalproject.seatudy.service.ChatRoomService;
@@ -13,7 +14,11 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.finalproject.seatudy.service.dto.request.ChatMessageDto.MessageType;
 
 @Component
 @Slf4j
@@ -38,41 +43,45 @@ public class StompHandler implements ChannelInterceptor {
                     (String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
 
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            String nickname = jwtDecoder.getMemberNickname(token).getNickname();
+            Member member = jwtDecoder.getMember(token);
+            chatRoomRepository.setUserEnterInfo(sessionId, roomId,member.getNickname());
 
-            chatRoomRepository.setUserEnterInfo(sessionId, roomId,nickname);
-            chatRoomRepository.increaseUserCount(roomId);
-            log.info("SUBSCRIBE: session_{} / roomId_{}", sessionId, roomId);
-            log.info("SUBSCRIBE: # of user in room_{} -- {}", roomId, chatRoomRepository.getUserCount(roomId));
-
-            log.info("SUBSCRIBE: {}님 '{}'입장", nickname, roomId);
-            chatRoomService.sendChatMessage(
-                    ChatMessageDto.builder()
-                            .type(ChatMessageDto.MessageType.ENTER)
-                            .roomId(roomId)
-                            .sender(nickname)
-                            .build()
-            );
+            if(!chatRoomRepository.isAlreadyExist(roomId, member.getNickname())) {
+                Map<String, Integer> rankListByNickname = chatRoomRepository.liveRankInChatRoom(roomId);
+                log.info(">>>>>>> RankList: {}", rankListByNickname);
+                log.info("SUBSCRIBE: session_{} / roomId_{}", sessionId, roomId);
+                log.info("SUBSCRIBE: {}님 '{}'입장", member.getNickname(), roomId);
+                chatRoomService.sendChatMessage(
+                        ChatMessageDto.builder()
+                                .type(MessageType.ENTER)
+                                .roomId(roomId)
+                                .sender(member.getNickname())
+                                .defaultFish(member.getDefaultFishUrl())
+                                .rankByNickname(rankListByNickname)
+                                .build()
+                );
+            }
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = (String) message.getHeaders().get("simpSessionId");
             String roomId = chatRoomRepository.getUserEnterRoomId(sessionId);
 
-            String nickname = chatRoomRepository.getNickname(sessionId, roomId);
-            chatRoomRepository.decreaseUserCount(roomId);
+            String nickname = chatRoomRepository.getMemberNickname(sessionId, roomId);
             chatRoomRepository.removeUserEnterInfo(sessionId, roomId);
 
-
-            log.info("DISCONNECT: session_{} / roomID_{}", sessionId, roomId);
-            log.info("DISCONNECT: # of user in room_{} -- {}", roomId, chatRoomRepository.getUserCount(roomId));
-
-            log.info("SUBSCRIBE: {}님 {} 퇴장", nickname, roomId);
-            chatRoomService.sendChatMessage(
-                    ChatMessageDto.builder()
-                            .type(ChatMessageDto.MessageType.EXIT)
-                            .roomId(roomId)
-                            .sender(nickname)
-                            .build()
-            );
+            if(!chatRoomRepository.isStillExist(roomId, nickname)) {
+                Map<String, Integer> rankListByNickname = chatRoomRepository.liveRankInChatRoom(roomId);
+                log.info(">>>>>>> RankList: {}", rankListByNickname);
+                log.info("DISCONNECT: session_{} / roomID_{}", sessionId, roomId);
+                log.info("SUBSCRIBE: {}님 {} 퇴장", nickname, roomId);
+                chatRoomService.sendChatMessage(
+                        ChatMessageDto.builder()
+                                .type(MessageType.EXIT)
+                                .roomId(roomId)
+                                .sender(nickname)
+                                .rankByNickname(rankListByNickname)
+                                .build()
+                );
+            }
         }
         return message;
     }
