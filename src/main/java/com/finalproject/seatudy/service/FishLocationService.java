@@ -71,4 +71,19 @@ public class FishLocationService {
         FishLocationResDto resDto = FishLocationResDto.fromEntity(foundMemberFish.get());
         return ResponseDto.success(resDto);
     }
+
+    public ResponseDto<?> resetAllFishLocations(UserDetailsImpl userDetails) {
+        Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+
+        List<MemberFish> allFishesByMember = memberFishRepository.findAllByMember(member);
+        List<FishLocationResDto> fishLocationResDtos = new ArrayList<>();
+
+        for (MemberFish memberFish : allFishesByMember) {
+            memberFish.resetLocation();
+            fishLocationResDtos.add(FishLocationResDto.fromEntity(memberFish));
+        }
+        return ResponseDto.success(fishLocationResDtos);
+    }
 }
