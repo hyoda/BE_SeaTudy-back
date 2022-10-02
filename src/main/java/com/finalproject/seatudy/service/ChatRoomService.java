@@ -3,6 +3,7 @@ package com.finalproject.seatudy.service;
 import com.finalproject.seatudy.domain.repository.ChatRoomRepository;
 import com.finalproject.seatudy.service.dto.request.ChatMessageDto;
 import com.finalproject.seatudy.service.dto.request.ChatRoom;
+import com.finalproject.seatudy.service.dto.response.MemberResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +46,7 @@ public class ChatRoomService {
 
     public void sendChatMessage(ChatMessageDto chatMessageDto) {
         chatMessageDto.setUserCount(chatRoomRepository.getUserCount(chatMessageDto.getRoomId()));
+        List<MemberResDto.ChatMemberRankDto> rankListByNickname = chatRoomRepository.liveRankInChatRoom(chatMessageDto.getRoomId());
         if(ChatMessageDto.MessageType.ENTER.equals(chatMessageDto.getType())) {
             chatMessageDto.setMessage("'"+chatMessageDto.getSender()+"'"+"님이 입장하였습니다.");
             chatMessageDto.setSender("[NOTICE]");
@@ -52,6 +54,7 @@ public class ChatRoomService {
             chatMessageDto.setMessage("'"+chatMessageDto.getSender()+"'"+"님이 퇴장하였습니다.");
             chatMessageDto.setSender("[NOTICE]");
         }
+        chatMessageDto.setRankByNickname(rankListByNickname);
         redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessageDto);
     }
 }

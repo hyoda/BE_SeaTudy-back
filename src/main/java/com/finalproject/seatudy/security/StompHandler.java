@@ -15,10 +15,10 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.finalproject.seatudy.service.dto.request.ChatMessageDto.MessageType;
+import static com.finalproject.seatudy.service.dto.response.MemberResDto.ChatMemberRankDto;
 
 @Component
 @Slf4j
@@ -42,18 +42,25 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = chatRoomService.getRoomId(Optional.ofNullable(
                     (String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
 
+            MessageType status;
+            int userCount = chatRoomRepository.getUserCount(roomId);
+            if(userCount == 1) {
+                log.info(">>>> current # of user: {}", userCount);
+                status = MessageType.FULL;
+            } else status = MessageType.ENTER;
+
             String sessionId = (String) message.getHeaders().get("simpSessionId");
             Member member = jwtDecoder.getMember(token);
             chatRoomRepository.setUserEnterInfo(sessionId, roomId,member.getNickname());
 
             if(!chatRoomRepository.isAlreadyExist(roomId, member.getNickname())) {
-                Map<String, Integer> rankListByNickname = chatRoomRepository.liveRankInChatRoom(roomId);
+                List<ChatMemberRankDto> rankListByNickname = chatRoomRepository.liveRankInChatRoom(roomId);
                 log.info(">>>>>>> RankList: {}", rankListByNickname);
                 log.info("SUBSCRIBE: session_{} / roomId_{}", sessionId, roomId);
                 log.info("SUBSCRIBE: {}님 '{}'입장", member.getNickname(), roomId);
                 chatRoomService.sendChatMessage(
                         ChatMessageDto.builder()
-                                .type(MessageType.ENTER)
+                                .type(status)
                                 .roomId(roomId)
                                 .sender(member.getNickname())
                                 .defaultFish(member.getDefaultFishUrl())
@@ -69,8 +76,6 @@ public class StompHandler implements ChannelInterceptor {
             chatRoomRepository.removeUserEnterInfo(sessionId, roomId);
 
             if(!chatRoomRepository.isStillExist(roomId, nickname)) {
-                Map<String, Integer> rankListByNickname = chatRoomRepository.liveRankInChatRoom(roomId);
-                log.info(">>>>>>> RankList: {}", rankListByNickname);
                 log.info("DISCONNECT: session_{} / roomID_{}", sessionId, roomId);
                 log.info("SUBSCRIBE: {}님 {} 퇴장", nickname, roomId);
                 chatRoomService.sendChatMessage(
@@ -78,7 +83,6 @@ public class StompHandler implements ChannelInterceptor {
                                 .type(MessageType.EXIT)
                                 .roomId(roomId)
                                 .sender(nickname)
-                                .rankByNickname(rankListByNickname)
                                 .build()
                 );
             }

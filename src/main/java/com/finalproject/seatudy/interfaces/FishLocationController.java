@@ -28,7 +28,7 @@ public class FishLocationController {
         return fishLocationService.updateFishLocation(userDetails, fishLocationReqDto);
     }
 
-    @PutMapping("/fishes/relocation/{fishNum}")
+    @PutMapping("/fishes/relocations/{fishNum}")
     public ResponseDto<?> resetFishLocation(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @PathVariable Long fishNum) {
         return fishLocationService.resetFishLocation(userDetails, fishNum);
