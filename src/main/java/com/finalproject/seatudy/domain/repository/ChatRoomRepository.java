@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.Resource;
 import java.util.*;
 
+import static com.finalproject.seatudy.service.dto.response.MemberResDto.ChatMemberRankDto;
+
 @Repository
 @Slf4j
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ public class ChatRoomRepository {
 
 
     // 채팅방 입장,퇴장때마다 채팅방 내에 랭킹확인하여 리스트 내려줌
-    public Map<String, Integer> liveRankInChatRoom(String roomId) {
+    public List<ChatMemberRankDto> liveRankInChatRoom(String roomId) {
         Map<String, String> entries = hashOpsEnterInfo.entries(ENTER_INFO + "_" + roomId);
         Collection<String> nicknameList = entries.values();
         Set<String> nicknameSetList = new HashSet<>(nicknameList);
@@ -69,11 +71,13 @@ public class ChatRoomRepository {
         List<String> pointList = new ArrayList<>(pointMapList.keySet());
         pointList.sort((v1, v2) -> pointMapList.get(v2).compareTo(pointMapList.get(v1)));
 
-        Map<String, Integer> liveRankByNickname = new HashMap<>();
+        List<ChatMemberRankDto> liveRankList = new ArrayList<>();
         for (String nickname : pointList) {
-            liveRankByNickname.put(nickname, pointMapList.get(nickname));
+            liveRankList.add(ChatMemberRankDto.builder()
+                    .nickname(nickname)
+                    .point(pointMapList.get(nickname)).build());
         }
-        return liveRankByNickname;
+        return liveRankList;
     }
 
 

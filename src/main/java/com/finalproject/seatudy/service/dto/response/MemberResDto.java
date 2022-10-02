@@ -3,6 +3,7 @@ package com.finalproject.seatudy.service.dto.response;
 import com.finalproject.seatudy.domain.LoginType;
 import com.finalproject.seatudy.domain.entity.Member;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +34,15 @@ public class MemberResDto {
     @NoArgsConstructor
     public static class MemberOauthResDto {
         private String email;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ChatMemberRankDto {
+        private String nickname;
+        private int point;
     }
 
 

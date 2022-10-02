@@ -3,9 +3,9 @@ package com.finalproject.seatudy.service.dto.request;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static com.finalproject.seatudy.service.dto.response.MemberResDto.ChatMemberRankDto;
 
 @Getter
 @Setter
@@ -18,10 +18,10 @@ public class ChatMessageDto {
     private String sender;
     private String message;
     private String defaultFish;
-    private Map<String, Integer> rankByNickname = new HashMap<>();
+    private List<ChatMemberRankDto> rankByNickname = new ArrayList<>();
     private long userCount;
 
     public enum MessageType {
-        ENTER, EXIT, TALK
+        ENTER, EXIT, TALK, FULL
     }
 }
