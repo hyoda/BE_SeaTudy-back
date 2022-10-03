@@ -102,7 +102,7 @@ public class TodoCategoryService {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        List<TodoCategory> todoCategories= todoCategoryRepository.findAllBySelectDateContaining(selectDate);
+        List<TodoCategory> todoCategories= todoCategoryRepository.findAllByMemberAndSelectDateContaining(member,selectDate);
         List<TodoCategoryResponseDto> todoCategoryResponseDtos = new ArrayList<>();
 
         for (TodoCategory todoCategory : todoCategories){
