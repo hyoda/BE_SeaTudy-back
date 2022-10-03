@@ -44,7 +44,7 @@ public class StompHandler implements ChannelInterceptor {
 
             MessageType status;
             int userCount = chatRoomRepository.getUserCount(roomId);
-            if(userCount == 1) {
+            if(userCount == 2) {
                 log.info(">>>> current # of user: {}", userCount);
                 status = MessageType.FULL;
             } else status = MessageType.ENTER;
