@@ -12,7 +12,7 @@ import java.util.List;
 public interface TodoCategoryRepository extends JpaRepository<TodoCategory, Long> {
 
     List<TodoCategory> findAllByMember(Member member);
-    List<TodoCategory> findAllBySelectDateContaining(String selectDate);
+    List<TodoCategory> findAllByMemberAndSelectDateContaining(Member member, String selectDate);
     List<TodoCategory> findAllByCategoryName(String categoryName);
     List<TodoCategory> findAllByCategoryNameAndSelectDate(String categoryName, String selectDate);
 
