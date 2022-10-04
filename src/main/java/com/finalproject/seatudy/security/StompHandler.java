@@ -42,13 +42,6 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = chatRoomService.getRoomId(Optional.ofNullable(
                     (String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
 
-            MessageType status;
-            int userCount = chatRoomRepository.getUserCount(roomId);
-            if(userCount == 2) {
-                log.info(">>>> current # of user: {}", userCount);
-                status = MessageType.FULL;
-            } else status = MessageType.ENTER;
-
             String sessionId = (String) message.getHeaders().get("simpSessionId");
             Member member = jwtDecoder.getMember(token);
             chatRoomRepository.setUserEnterInfo(sessionId, roomId,member.getNickname());
@@ -60,7 +53,7 @@ public class StompHandler implements ChannelInterceptor {
                 log.info("SUBSCRIBE: {}님 '{}'입장", member.getNickname(), roomId);
                 chatRoomService.sendChatMessage(
                         ChatMessageDto.builder()
-                                .type(status)
+                                .type(MessageType.ENTER)
                                 .roomId(roomId)
                                 .sender(member.getNickname())
                                 .defaultFish(member.getDefaultFishUrl())

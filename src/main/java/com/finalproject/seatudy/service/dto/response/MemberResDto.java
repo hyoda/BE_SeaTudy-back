@@ -42,6 +42,7 @@ public class MemberResDto {
     @Builder
     public static class ChatMemberRankDto {
         private String nickname;
+        private String defaultFish;
         private int point;
     }
 

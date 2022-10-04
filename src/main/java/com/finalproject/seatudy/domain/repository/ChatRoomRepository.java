@@ -1,6 +1,5 @@
 package com.finalproject.seatudy.domain.repository;
 
-import com.finalproject.seatudy.service.dto.request.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
@@ -16,11 +15,7 @@ import static com.finalproject.seatudy.service.dto.response.MemberResDto.ChatMem
 @RequiredArgsConstructor
 public class ChatRoomRepository {
 
-    private static final String CHAT_ROOMS = "CHAT_ROOM";
     private static final String ENTER_INFO = "ENTER_INFO";
-
-    @Resource(name = "redisTemplate")
-    private HashOperations<String, String, ChatRoom> opsHashChatRoom;
     @Resource(name = "redisTemplate")
     private HashOperations<String, String, String> hashOpsEnterInfo;
 
@@ -56,7 +51,6 @@ public class ChatRoomRepository {
         return count == 1;
     }
 
-
     // 채팅방 입장,퇴장때마다 채팅방 내에 랭킹확인하여 리스트 내려줌
     public List<ChatMemberRankDto> liveRankInChatRoom(String roomId) {
         Map<String, String> entries = hashOpsEnterInfo.entries(ENTER_INFO + "_" + roomId);
@@ -75,11 +69,11 @@ public class ChatRoomRepository {
         for (String nickname : pointList) {
             liveRankList.add(ChatMemberRankDto.builder()
                     .nickname(nickname)
+                    .defaultFish(memberRepository.findByNickname(nickname).get().getDefaultFishUrl())
                     .point(pointMapList.get(nickname)).build());
         }
         return liveRankList;
     }
-
 
     //유저 세션으로 입장해 있는 채팅방 ID조회
     public String getUserEnterRoomId(String sessionId) {
