@@ -43,6 +43,7 @@ public class MemberResDto {
     public static class ChatMemberRankDto {
         private String nickname;
         private String defaultFish;
+        private String totalStudy;
         private int point;
     }
 
