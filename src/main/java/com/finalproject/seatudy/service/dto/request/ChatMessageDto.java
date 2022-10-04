@@ -22,6 +22,6 @@ public class ChatMessageDto {
     private long userCount;
 
     public enum MessageType {
-        ENTER, EXIT, TALK, FULL
+        ENTER, EXIT, TALK
     }
 }
