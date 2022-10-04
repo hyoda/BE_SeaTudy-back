@@ -33,4 +33,9 @@ public class FishLocationController {
                                             @PathVariable Long fishNum) {
         return fishLocationService.resetFishLocation(userDetails, fishNum);
     }
+
+    @PutMapping("/fishes/allRelocations")
+    public ResponseDto<?> resetAllFishLocations(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return fishLocationService.resetAllFishLocations(userDetails);
+    }
 }
