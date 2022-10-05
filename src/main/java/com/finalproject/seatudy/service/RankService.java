@@ -35,7 +35,6 @@ public class RankService {
     public ResponseDto<?> getDayRank() throws ParseException {
 
         Calendar today = getToday();
-        today.add(Calendar.DATE, -1);
         String setToday = dateFormat(today);
 
         List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
