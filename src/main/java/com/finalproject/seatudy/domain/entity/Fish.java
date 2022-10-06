@@ -1,7 +1,6 @@
-package com.finalproject.seatudy.entity;
+package com.finalproject.seatudy.domain.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,17 +10,13 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Builder
-public class Rank {
-
+public class Fish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long rankId;
-
-    private String studyTime;
-
-    @ManyToOne
-    private Member member;
-
-
+    private Long fishId;
+    private String fishName;
+    private int fishPoint;
+    private String fishImageUrl;
+    @Lob
+    private String fishInfo;
 }
