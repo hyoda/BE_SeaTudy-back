@@ -47,7 +47,6 @@ public class RankService {
         Member member = userDetails.getMember();
 
         Calendar today = getToday();
-        today.add(Calendar.DATE, -1);
         String setToday = dateFormat(today);
 
         int myRank;
