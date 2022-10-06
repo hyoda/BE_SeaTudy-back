@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -29,9 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity(debug = true) // 스프링 Security 지원을 가능하게 함
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(securedEnabled = true) // @Secured 어노테이션 활성화
 public class WebSecurityConfig {
 
     private final JWTAuthProvider jwtAuthProvider;
@@ -64,8 +62,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManagerBuilder auth) throws Exception {
-        //인증 (Authentication)**: 사용자 신원을 확인하는 행위
-        //인가 (Authorization)**: 사용자 권한을 확인하는 행위
         auth.authenticationProvider(jwtAuthProvider);
 
         http.cors().configurationSource(corsConfigurationSource());
@@ -78,9 +74,6 @@ public class WebSecurityConfig {
         http
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        /*
-         * JwtFilter       : 서버에 접근시 JWT 확인 후 인증을 실시합니다.
-         */
         http
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -88,9 +81,7 @@ public class WebSecurityConfig {
                 .anyRequest()
                 .permitAll()
                 .and()
-               // [로그아웃 기능]
                 .logout()
-               // 로그아웃 요청 처리 URL
                 .logoutUrl("/api/logout")
                 .logoutSuccessUrl("/")
                 .permitAll();
@@ -108,27 +99,18 @@ public class WebSecurityConfig {
     private JwtAuthFilter jwtFilter() throws Exception {
         List<String> skipPathList = new ArrayList<>();
 
-        // Static 정보 접근 허용
         skipPathList.add("GET,/images/**");
         skipPathList.add("GET,/css/**");
 
-
-        //카카오톡 skipPathList
         skipPathList.add("GET,/api/v1/members/kakaoLogin/**");
         skipPathList.add("GET,/api/v1/members/naverLogin/**");
         skipPathList.add("GET,/api/v1/members/googleLogin/**");
 
-
-        //회원가입하기, 로그인 관련 skipPathList
-        skipPathList.add("POST,/api/member/signup");  //회원가입
+        skipPathList.add("POST,/api/member/signup");
         skipPathList.add("POST,/api/member/login/**");
 
-
-//----------아래는 그대로----------
         skipPathList.add("GET,/basic.js");
-
         skipPathList.add("GET,/favicon.ico");
-
 
         FilterSkipMatcher matcher = new FilterSkipMatcher(skipPathList, "/**");
         JwtAuthFilter filter = new JwtAuthFilter(matcher,headerTokenExtractor);
@@ -139,7 +121,6 @@ public class WebSecurityConfig {
     }
 
 
-    //cors
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();

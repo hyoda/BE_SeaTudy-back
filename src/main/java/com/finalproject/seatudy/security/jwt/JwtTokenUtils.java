@@ -35,20 +35,6 @@ public final class JwtTokenUtils {
         return token;
     }
 
-//    public static String generateJwtRefreshToken(){
-//        String refreshToken = null;
-//
-//        try{
-//            refreshToken=JWT.create()
-//                    .withClaim(CLAIM_EXPIRED_DATE,new Date(System.currentTimeMillis()+ JWT_REFRESH_TOKEN_VALID_MILLI_SEC))
-//                    .sign(generateAlgorithm());
-//        }
-//        catch (Exception e){
-//            System.out.println(e.getMessage());
-//        }
-//        return refreshToken;
-//    }
-
     private Algorithm generateAlgorithm(){
         return Algorithm.HMAC256(Decoders.BASE64.decode(JWT_SECRET));
     }

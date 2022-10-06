@@ -1,17 +1,17 @@
 package com.finalproject.seatudy.service;
 
-import com.finalproject.seatudy.security.exception.CustomException;
-import com.finalproject.seatudy.security.exception.ErrorCode;
-import com.finalproject.seatudy.service.dto.response.ResponseDto;
+import com.finalproject.seatudy.domain.entity.Member;
 import com.finalproject.seatudy.domain.entity.TodoCategory;
 import com.finalproject.seatudy.domain.entity.TodoList;
-import com.finalproject.seatudy.domain.entity.Member;
 import com.finalproject.seatudy.domain.repository.MemberRepository;
-import com.finalproject.seatudy.security.UserDetailsImpl;
 import com.finalproject.seatudy.domain.repository.TodoCategoryRepository;
+import com.finalproject.seatudy.domain.repository.TodoListRepository;
+import com.finalproject.seatudy.security.UserDetailsImpl;
+import com.finalproject.seatudy.security.exception.CustomException;
+import com.finalproject.seatudy.security.exception.ErrorCode;
 import com.finalproject.seatudy.service.dto.request.TodoListRequestDto;
 import com.finalproject.seatudy.service.dto.request.TodoListUpdateDto;
-import com.finalproject.seatudy.domain.repository.TodoListRepository;
+import com.finalproject.seatudy.service.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.finalproject.seatudy.security.exception.ErrorCode.*;
-import static com.finalproject.seatudy.service.dto.response.TodoListResponseDto.*;
+import static com.finalproject.seatudy.service.dto.response.TodoListResponseDto.TodoListCateResDto;
 
 
 @Service
@@ -31,7 +31,6 @@ public class TodoListService {
     private final TodoCategoryRepository todoCategoryRepository;
     private final MemberRepository memberRepository;
 
-    //todo 리스트 생성
     public ResponseDto<?> createTodoList(UserDetailsImpl userDetails,Long todoCategoryId,TodoListRequestDto todoListRequestDto){
         if(todoListRequestDto.getContent().isEmpty()){
             throw new CustomException(EMPTY_TODOLIST);
@@ -67,7 +66,6 @@ public class TodoListService {
         throw new CustomException(TODOLIST_FORBIDDEN_POST);
     }
 
-    //todo 리스트 수정
     public ResponseDto<?> updateTodoList(UserDetailsImpl userDetails, Long todoId, TodoListUpdateDto todoListUpdateDto){
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
@@ -86,7 +84,6 @@ public class TodoListService {
 
     }
 
-    //todo 리스트 삭제
     public ResponseDto<?> deleteTodoList(UserDetailsImpl userDetails,Long todoId){
 
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -103,7 +100,6 @@ public class TodoListService {
         throw new CustomException(TODOLIST_FORBIDDEN_DELETE);
     }
 
-    //todo 리스트 완료
     public ResponseDto<?> completeTodoList(UserDetailsImpl userDetails,Long todoId) {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)

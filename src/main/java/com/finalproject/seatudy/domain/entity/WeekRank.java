@@ -18,7 +18,6 @@ public class WeekRank {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long weekRankId;
 
-    // 일주일 공부한 시간
     @Column
     private String weekStudy;
 

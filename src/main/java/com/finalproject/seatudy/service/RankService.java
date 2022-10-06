@@ -33,12 +33,10 @@ public class RankService {
     private final MemberRepository memberRepository;
 
     public ResponseDto<?> getDayRank() throws ParseException {
-
         Calendar today = getToday();
         String setToday = dateFormat(today);
 
         List<Rank> dayStudyRanks = rankRepository.findTop20ByDateOrderByDayStudyDesc(setToday);
-
         return ResponseDto.success(dayStudyRanks.stream().map(RankResponseDto::fromEntity)
                 .collect(Collectors.toList()));
     }
@@ -53,17 +51,13 @@ public class RankService {
         Optional<Rank> rank = rankRepository.findByMemberAndDate(member, setToday);
         if (rank.isEmpty()){
             MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), 0);
-
             return ResponseDto.success(responseDto);
-
         }
 
         List<Rank> dayStudyRanks = rankRepository.findAllByDateOrderByDayStudyDesc(setToday);
-
         myRank = dayStudyRanks.indexOf(rank.get())+1;
 
         MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), myRank);
-
         return ResponseDto.success(responseDto);
     }
 
@@ -106,16 +100,13 @@ public class RankService {
         Optional<WeekRank> weekRank = weekRankRepository.findByMemberAndWeek(member, week);
         if (weekRank.isEmpty()){
             MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), 0);
-
             return ResponseDto.success(responseDto);
         }
 
         List<WeekRank> weekDayStudyRanks = weekRankRepository.findAllByYearAndWeekOrderByWeekStudyDesc(year,week);
-
         myRank = weekDayStudyRanks.indexOf(weekRank.get())+1;
 
         MyRankResponseDto responseDto = new MyRankResponseDto(member.getNickname(), myRank);
-
         return ResponseDto.success(responseDto);
     }
 
@@ -128,7 +119,6 @@ public class RankService {
             int HH = Integer.parseInt(arrayFind[0]);
             responseDtos.add(new DayStudyResponseDto(dayStudy.getDate(), HH));
         }
-
         return ResponseDto.success(responseDtos);
     }
 
@@ -143,20 +133,16 @@ public class RankService {
             int week = weekStudy.getWeek();
             responseDtos.add(new WeekStudyResponseDto(week, weekHH));
         }
-
-
         return ResponseDto.success(responseDtos);
     }
 
     public ResponseDto<?> getWeekStudyDetail(String date, UserDetailsImpl userDetails) throws ParseException {
-
         Member member = userDetails.getMember();
 
         Calendar cal = setWeekDate(date);
 
         int week = cal.get(Calendar.WEEK_OF_YEAR)-1;
         String[] weekDays = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-
 
         List<Rank> weekStudyDetails = rankRepository.findAllByMemberAndWeek(member, week);
         List<WeekStudyDetailResponseDto> responseDtos = new ArrayList<>();
@@ -172,9 +158,7 @@ public class RankService {
             int HH = Integer.parseInt(arrayFind[0]);
             responseDtos.add(WeekStudyDetailResponseDto.toDto(weekDay, HH));
         }
-
         return ResponseDto.success(responseDtos);
-
     }
 
     @Scheduled(cron = " 50 59 4 * * 1 ")
@@ -230,33 +214,14 @@ public class RankService {
                     .build();
             weekRankRepository.save(afterWeekRank);
         }
-
     }
 
     public Calendar setWeekDate(String date) throws ParseException {
-        String strDate = date;
-        Date weekDate = sdf.parse(strDate);
+        Date weekDate = sdf.parse(date);
         weekDate = new Date(weekDate.getTime() + (1000 * 60 * 60 * 24 - 1));
         Calendar cal = Calendar.getInstance();
         cal.setFirstDayOfWeek(Calendar.MONDAY);
         cal.setTime(weekDate);
         return cal;
     }
-
-    private Calendar getToday() throws ParseException {
-        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString();
-
-        Calendar setDay = todayCalendar(date); // 오늘 기준 캘린더
-        setCalendarTime(setDay); // yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
-
-        Calendar today = todayCalendar(date); // 현재 시간 기준 날짜
-        todayCalendarTime(today); // String yyyy-MM-dd HH:mm:ss 현재시간
-
-        // compareTo() < 0 : 현재시간이 캘린더보다 작으면(음수) 과거
-        if (today.compareTo(setDay) < 0) {
-            today.add(Calendar.DATE, -1);  // 오전 5시보다 과거라면, 현재 날짜에서 -1
-        }
-        return today;
-    }
-
 }

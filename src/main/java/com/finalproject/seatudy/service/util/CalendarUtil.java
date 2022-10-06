@@ -3,6 +3,7 @@ package com.finalproject.seatudy.service.util;
 import com.finalproject.seatudy.domain.entity.Rank;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,31 +17,26 @@ import static java.lang.String.format;
 
 public class CalendarUtil {
 
-    // 캘린더 생성
-    // SimpleDateFormat.parse()메소드는 입력한 문자열 형식의 날짜가 Format이 다를경우 java.text.ParseException을 발생한다.
     public static Calendar todayCalendar(String date) throws ParseException{
-        Calendar today = Calendar.getInstance(); // 캘린더를 생성 (캘린더는 추상클래스이므로 getInstance()을 통해 구현된 객체를 얻어야함)
-        today.setTime(sdf.parse(date)); // 파라미터 기준으로 캘린더 셋팅
+        Calendar today = Calendar.getInstance();
+        today.setTime(sdf.parse(date));
         return today;
     }
 
-    // 날짜 형식에 맞게 string으로 포맷
     public static String dateFormat(Calendar calendar){
         return sdf.format(calendar.getTime());
     }
 
-    // 현재 시간 기준으로 셋팅
     public static void todayCalendarTime(Calendar setTime) throws ParseException{
-        String nowDateTime = nowDateTime(); // 현재 시간 -> string yyyy-MM-dd HH:mm:ss 형식
-        Date nowFormatter = sdtf.parse(nowDateTime); // DateTime 형식으로 포맷
+        String nowDateTime = nowDateTime();
+        Date nowFormatter = sdtf.parse(nowDateTime);
         setTime.setTime(nowFormatter);
     }
 
-    // 당일 오전 다섯시로 셋팅
     public static void setCalendarTime(Calendar setTime) throws ParseException {
-        String strToday = dateFormat(setTime); //오늘 날짜 str yyyy-MM-dd 형식
-        Date setFormatter = dateTimeFormat(strToday); //yyyy-MM-dd 05:00:00(당일 오전 5시)
-        setTime.setTime(setFormatter); //yyyy-MM-dd 05:00:00(당일 오전 5시) 캘린더에 적용
+        String strToday = dateFormat(setTime);
+        Date setFormatter = dateTimeFormat(strToday);
+        setTime.setTime(setFormatter);
     }
 
     public static String totalTime(List<Rank> allUserList) {
@@ -61,8 +57,6 @@ public class CalendarUtil {
         int totalSS = ((total % 3600) % 60);
 
         return format("%02d:%02d:%02d",totalHH,totalMM,totalSS);
-//        String totalSumTime = totalHH + ":" + totalMM + ":" + totalSS;
-//        return totalSumTime;
     }
 
     public static int totalPoint(List<Rank> allUserList) {
@@ -82,7 +76,6 @@ public class CalendarUtil {
     }
 
 
-    // String yyyy-MM-dd HH:mm:ss 형식으로 return; 현재 시간
     private static String nowDateTime() {
         ZonedDateTime nowSeoul = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         String nowYear = String.valueOf(nowSeoul.getYear());
@@ -92,9 +85,24 @@ public class CalendarUtil {
         return nowYear + "-" + nowMonth + "-" + nowDay + " " + nowTime;
     }
 
-    // 전 날 오전 5시 기준 데이터 포맷
     private static Date dateTimeFormat(String setDate) throws ParseException {
-        String setToday = setDate + "05:00:00"; //어제 날짜 + 오전5시 -> 조건을 걸기 위해 만들어줌?
+        String setToday = setDate + "05:00:00";
         return sdtf.parse(setToday);
+    }
+
+
+    public static Calendar getToday() throws ParseException {
+        String date = LocalDate.now(ZoneId.of("Asia/Seoul")).toString(); // 현재 서울 날짜
+
+        Calendar setDay = todayCalendar(date);
+        setCalendarTime(setDay);
+
+        Calendar today = todayCalendar(date);
+        todayCalendarTime(today);
+
+        if (today.compareTo(setDay) < 0) {
+            today.add(Calendar.DATE, -1);
+        }
+        return today;
     }
 }
