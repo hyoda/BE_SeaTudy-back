@@ -135,7 +135,7 @@ public class DdayService {
     private Long ddayCalculate (String targetDay, String baseDay) throws ParseException {
         Date ddate = sdf.parse(targetDay);
         Date todate = sdf.parse(baseDay);
-        long Sec = (ddate.getTime() - todate.getTime()) / 1000; // 초
+        long Sec = (ddate.getTime() - todate.getTime()) / 1000;
         return -(Sec / (24*60*60));
     }
 

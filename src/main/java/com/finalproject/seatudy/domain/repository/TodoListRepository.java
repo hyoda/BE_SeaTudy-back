@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TodoListRepository extends JpaRepository<TodoList, Long> {
-    List<TodoList> findAllBySelectDateContaining(String selectDate);
     List<TodoList> findAllBySelectDateAndTodoCategory_CategoryName(String selectDate, String categoryName);
 }

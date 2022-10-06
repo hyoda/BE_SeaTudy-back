@@ -20,10 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${front.base.url}")
     private String FRONT_BASE_URL;
 
-
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // SockJS Client or WebSocket이 HandShake Connection을 생성할 경로
         registry.addEndpoint("/api/v1/chat/connections")
                 .setAllowedOrigins("http://localhost:8080", "http://localhost:3000",
                         FRONT_BASE_URL)
@@ -33,7 +31,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.setApplicationDestinationPrefixes("/pub");
-        // simpleBroker는 해당경로를 SUBSCRIBE하는 client 에게 메세지를 전달하는 작업 수행
         config.enableSimpleBroker("/sub");
     }
 

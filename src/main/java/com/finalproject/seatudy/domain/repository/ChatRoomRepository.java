@@ -25,19 +25,16 @@ public class ChatRoomRepository {
     private final MemberRepository memberRepository;
     private final RankRepository rankRepository;
 
-    //유저가 입장한 채팅서버ID와 유저 세션ID 맵핑 정보 저장
     public void setUserEnterInfo(String sessionId, String roomId, String nickname) {
         hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
         hashOpsEnterInfo.put(ENTER_INFO + "_" + roomId, sessionId, nickname);
     }
 
-    // 유저 세션으로 입장해 있는 채팅방 ID 삭제
     public void removeUserEnterInfo(String sessionId, String roomId) {
         hashOpsEnterInfo.delete(ENTER_INFO, sessionId);
         hashOpsEnterInfo.delete(ENTER_INFO + "_" + roomId, sessionId);
     }
 
-    // 같은 유저가 다른 sessionId 상태로 채팅방 입장할 때
     public boolean isAlreadyExist(String roomId, String nickname) {
         Map<String, String> entries = hashOpsEnterInfo.entries(ENTER_INFO + "_" + roomId);
         Collection<String> nicknameList = entries.values();
@@ -46,7 +43,6 @@ public class ChatRoomRepository {
         return count > 1;
     }
 
-    // 같은 유저가 다른 sessionId 상태로 채팅방 입장 후, 퇴장할 때
     public boolean isStillExist(String roomId, String nickname) {
         Map<String, String> entries = hashOpsEnterInfo.entries(ENTER_INFO + "_" + roomId);
         Collection<String> nicknameList = entries.values();
@@ -55,7 +51,6 @@ public class ChatRoomRepository {
         return count == 1;
     }
 
-    // 채팅방 입장,퇴장때마다 채팅방 내에 랭킹확인하여 리스트 내려줌
     public List<ChatMemberRankDto> liveRankInChatRoom(String roomId) {
         Map<String, String> entries = hashOpsEnterInfo.entries(ENTER_INFO + "_" + roomId);
         Collection<String> nicknameList = entries.values();
@@ -85,7 +80,6 @@ public class ChatRoomRepository {
         return liveRankList;
     }
 
-    //유저 세션으로 입장해 있는 채팅방 ID조회
     public String getUserEnterRoomId(String sessionId) {
         return hashOpsEnterInfo.get(ENTER_INFO, sessionId);
     }
@@ -94,7 +88,6 @@ public class ChatRoomRepository {
         return hashOpsEnterInfo.get(ENTER_INFO + "_" + roomId, sessionId);
     }
 
-    // 채팅방 내 인원수 확인
     public int getUserCount(String roomId) {
         Map<String, String> entries = hashOpsEnterInfo.entries(ENTER_INFO + "_" + roomId);
         Collection<String> nicknameList = entries.values();

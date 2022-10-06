@@ -85,7 +85,6 @@ public class MemberService {
         return true;
     }
 
-    // Oauth 로그인시 카카오,네이버,구글로 부터 회원정보 받아오기 위한 메서드
     public static JsonNode getUserInfo(String accessTokens, String userInfoUri) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessTokens);
@@ -101,10 +100,6 @@ public class MemberService {
         return objectMapper.readTree(responseBody);
     }
 
-    /*
-    SeaTUDY의 회원이 아닐 경우, 강제 회원가입을 위한 메서드
-    최초 가입시, 회원 닉네임은 임의로 지정
-     */
     @Transactional
     public Member registerSocialLoginMemberIfNeed(MemberOauthResDto memberOauthResDto, LoginType loginType) {
         String email = memberOauthResDto.getEmail();
@@ -138,7 +133,6 @@ public class MemberService {
         response.addHeader("Authorization", "Bearer " + token);
     }
 
-    // 현재 total point 업데이트 및 unlock 물고기 업데이트해줌
     @Transactional
     public ResponseDto<?> getMyProfile(UserDetailsImpl userDetails) {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -169,7 +163,6 @@ public class MemberService {
     }
 
 
-    // 프로필사진(물고기 캐릭터) 수정메서드
     @Transactional
     public ResponseDto<?> updateFishImage(UserDetailsImpl userDetails, String fishName) {
         Member member = memberRepository.findByEmail(userDetails.getUsername()).orElseThrow(

@@ -58,7 +58,6 @@ public class RankController {
     @ApiOperation(value = "주간 요일별 공부량 리스트 조회")
     public ResponseDto<?> getWeekStudyDetail(@RequestParam String date,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails) throws ParseException {
-
         return rankService.getWeekStudyDetail(date, userDetails);
     }
 }

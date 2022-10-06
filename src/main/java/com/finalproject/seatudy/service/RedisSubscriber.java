@@ -11,10 +11,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class RedisSubscriber {
-
     private final ObjectMapper objectMapper;
     private final SimpMessagingTemplate messagingTemplate;
-
     public void sendMessage(String publishMessage) {
         try {
             ChatMessageDto chatMessageDto = objectMapper.readValue(publishMessage, ChatMessageDto.class);
